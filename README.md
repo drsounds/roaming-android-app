@@ -34,6 +34,8 @@ intensity
 }
 ````
 
+When active also show an overlay on the screen, a bubble
+
 # Privacy
 
 * Only local
