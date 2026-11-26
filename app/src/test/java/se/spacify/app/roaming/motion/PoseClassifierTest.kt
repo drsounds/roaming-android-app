@@ -73,4 +73,22 @@ class PoseClassifierTest {
         assertEquals(8, steps)
         assertEquals(MotionType.WALKING, state.motionType)
     }
+
+    @Test
+    fun heldOneArmOutIsRaising() {
+        val c = PoseClassifier()
+        val pose = standing().copy(leftWrist = Point(340f, 205f))
+        c.classify(pose, 0)
+        val state = c.classify(pose, 300).first
+        assertEquals(MotionType.RAISING, state.motionType)
+        assertEquals(Direction.LEFT, state.direction)
+    }
+
+    @Test
+    fun heldOneArmUpIsRaisingUp() {
+        val c = PoseClassifier()
+        val pose = standing().copy(rightWrist = Point(150f, 60f))
+        c.classify(pose, 0)
+        assertEquals(Direction.UP, c.classify(pose, 300).first.direction)
+    }
 }

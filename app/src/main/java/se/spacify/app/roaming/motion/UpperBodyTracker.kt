@@ -67,6 +67,7 @@ class UpperBodyTracker(
     private val headSway = RhythmDetector(minHysteresis = 0.03f, stepOnBothCrossings = true)
     private val bob = RhythmDetector(minHysteresis = 0.02f, stepOnBothCrossings = false)
     private val detectors = listOf(armSwing, elbowSwing, headSway, bob)
+    private val raise = ArmRaiseDetector()
 
     /**
      * Feeds one frame. Returns the state and whether a step was detected on this frame.
@@ -175,6 +176,14 @@ class UpperBodyTracker(
             val lift = (nose.y - minOf(lw.y, rw.y)) / ARMS_RAISED_FULL
             return MotionState.of(MotionType.ARMS_RAISED, Direction.UP, lift) to false
         }
+        // One arm up or out to a side, held: RAISING. The hips aren't in view, so no `down` here.
+        // The body frame is in shoulder widths; a torso is about 1.5 of them.
+        if (nose != null) {
+            raise.update(nose, Point(0.5f, 0f), Point(-0.5f, 0f), lw, rw, null, TORSO_IN_WIDTHS, nowMillis)
+                ?.let { return it to false }
+        } else {
+            raise.reset()
+        }
         if (cadence <= 0f || intensity <= 0f) return MotionState.IDLE to false
         val type = if (cadence >= runningCadence) MotionType.RUNNING else MotionType.WALKING
         return MotionState.of(type, Direction.FORWARD, max(intensity, cadence / maxCadence)) to stepped
@@ -193,6 +202,7 @@ class UpperBodyTracker(
         roll = null
         steps.clear()
         detectors.forEach { it.clear() }
+        raise.reset()
     }
 
     private fun cadence(nowMillis: Long): Float {
@@ -258,6 +268,9 @@ class UpperBodyTracker(
 
         /** Wrists this many shoulder widths above the nose give full intensity for ARMS_RAISED. */
         const val ARMS_RAISED_FULL = 1.5f
+
+        /** Roughly how many shoulder widths a torso is, to reuse [ArmRaiseDetector]'s thresholds. */
+        const val TORSO_IN_WIDTHS = 1.5f
 
         fun alpha(dtMillis: Float, tauMillis: Float) = 1f - exp(-dtMillis / tauMillis)
 

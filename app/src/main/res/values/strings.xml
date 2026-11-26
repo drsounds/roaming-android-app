@@ -64,6 +64,7 @@
     <string name="motion_squatting">Squatting</string>
     <string name="motion_leaning">Leaning</string>
     <string name="motion_arms_raised">Arms raised</string>
+    <string name="motion_raising">Raising (arm up, down, left, right)</string>
 
     <string name="control_none">Nothing</string>
     <string name="control_left_stick">Left stick (follows direction)</string>

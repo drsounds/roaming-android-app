@@ -165,6 +165,26 @@ class UpperBodyTrackerTest {
     }
 
     @Test
+    fun heldArmOutToTheSideIsRaising() {
+        val tracker = UpperBodyTracker()
+        val out = pose().copy(leftWrist = Point(390f, 225f), leftElbow = Point(320f, 222f))
+        var state = MotionState.IDLE
+        for (i in 0 until 12) state = tracker.update(out, i * frameMillis).first
+        assertEquals(MotionType.RAISING, state.motionType)
+        assertEquals(Direction.LEFT, state.direction)
+    }
+
+    @Test
+    fun heldOneArmUpIsRaisingUp() {
+        val tracker = UpperBodyTracker()
+        val up = pose().copy(rightWrist = Point(140f, 60f))
+        var state = MotionState.IDLE
+        for (i in 0 until 12) state = tracker.update(up, i * frameMillis).first
+        assertEquals(MotionType.RAISING, state.motionType)
+        assertEquals(Direction.UP, state.direction)
+    }
+
+    @Test
     fun cameraSteadinessFollowsRotationRate() {
         val s = CameraSteadiness()
         for (i in 0 until 20) s.onRotationRate(0.01f, 0.02f, 0f, i * 20L)
