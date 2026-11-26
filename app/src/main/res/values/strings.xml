@@ -24,6 +24,17 @@
     <string name="gamepad_short">Gamepad</string>
     <string name="gamepad_switch">Act as a Bluetooth gamepad</string>
     <string name="gamepad_hint">Computers, Android TVs, tablets and other phones see Roaming as a standard wireless gamepad. Games on this phone can\'t use it; they listen to the broadcast instead.</string>
+    <string name="local_gamepad_switch">Act as a gamepad for apps on this phone</string>
+    <string name="local_gamepad_hint">Adds a virtual gamepad that games on this phone can use. Needs the free Shizuku app (or root), because Android doesn\'t let normal apps do this.</string>
+    <string name="local_gamepad_status_off">Phone gamepad is off. It starts with tracking.</string>
+    <string name="local_gamepad_status_starting">Starting the phone gamepad…</string>
+    <string name="local_gamepad_status_active">Phone gamepad is active. Switch to your game.</string>
+    <string name="local_gamepad_status_failed">Couldn\'t create the phone gamepad: %1$s</string>
+    <string name="local_gamepad_not_running">Shizuku isn\'t running. Start it in the Shizuku app (needed again after every restart), then start tracking again.</string>
+    <string name="local_gamepad_not_installed">Install and start Shizuku (or Sui on rooted phones) to use the phone gamepad.</string>
+    <string name="local_gamepad_too_old">Shizuku is too old. Update it to version 11 or later.</string>
+    <string name="local_gamepad_no_permission">Allow Roaming in Shizuku to use the phone gamepad.</string>
+    <string name="local_gamepad_setup">How to set up Shizuku</string>
     <string name="gamepad_title">Gamepad</string>
     <string name="gamepad_status_off">Gamepad is off. It starts with tracking.</string>
     <string name="gamepad_status_starting">Starting the gamepad…</string>

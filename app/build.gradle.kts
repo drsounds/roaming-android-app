@@ -65,6 +65,7 @@ android {
     buildFeatures {
         viewBinding = true
         buildConfig = true
+        aidl = true
     }
     testOptions {
         unitTests.isReturnDefaultValues = true
@@ -83,6 +84,9 @@ dependencies {
     implementation(libs.androidx.camera.lifecycle)
     // Bundled, fully on-device pose model (no Google Play services download, no network).
     implementation(libs.mlkit.pose.detection)
+    // Optional "gamepad for this phone": Shizuku runs the uhid service with ADB shell or root rights.
+    implementation(libs.shizuku.api)
+    implementation(libs.shizuku.provider)
 
     testImplementation(libs.junit)
     testImplementation(libs.org.json)

@@ -64,6 +64,19 @@
             android:text="@string/gamepad_hint"
             android:textAppearance="?attr/textAppearanceBodySmall" />
 
+        <com.google.android.material.materialswitch.MaterialSwitch
+            android:id="@+id/switch_gamepad_local"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/local_gamepad_switch" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/local_gamepad_hint"
+            android:textAppearance="?attr/textAppearanceBodySmall" />
+
         <Button
             android:id="@+id/button_overlay"
             style="?attr/materialButtonOutlinedStyle"
@@ -118,28 +131,58 @@
                 android:text="@string/gamepad_title"
                 android:textAppearance="?attr/textAppearanceTitleLarge" />
 
-            <TextView
-                android:id="@+id/text_gamepad_status"
+            <LinearLayout
+                android:id="@+id/bluetooth_controls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="4dp"
-                android:text="@string/gamepad_status_off"
-                android:textAppearance="?attr/textAppearanceTitleSmall" />
+                android:orientation="vertical">
 
-            <Button
-                android:id="@+id/button_discoverable"
-                style="?attr/materialButtonOutlinedStyle"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:text="@string/gamepad_discoverable" />
+                <TextView
+                    android:id="@+id/text_gamepad_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/gamepad_status_off"
+                    android:textAppearance="?attr/textAppearanceTitleSmall" />
 
-            <Button
-                android:id="@+id/button_connect_host"
-                style="?attr/materialButtonOutlinedStyle"
+                <Button
+                    android:id="@+id/button_discoverable"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/gamepad_discoverable" />
+
+                <Button
+                    android:id="@+id/button_connect_host"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/gamepad_connect_paired" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/local_controls"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/gamepad_connect_paired" />
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/text_local_status"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/local_gamepad_status_off"
+                    android:textAppearance="?attr/textAppearanceTitleSmall" />
+
+                <Button
+                    android:id="@+id/button_shizuku_help"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/local_gamepad_setup" />
+            </LinearLayout>
 
             <TextView
                 android:layout_width="wrap_content"

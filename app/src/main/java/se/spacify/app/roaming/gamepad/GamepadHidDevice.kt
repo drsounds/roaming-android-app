@@ -11,44 +11,26 @@ import android.bluetooth.BluetoothProfile
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import android.os.Handler
-import android.os.Looper
-import android.os.SystemClock
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
-import se.spacify.app.roaming.motion.MotionEvent
 
 /**
  * Presents the phone as a standard Bluetooth HID gamepad, using Android's [BluetoothHidDevice]
  * profile (Android 9+). Computers, TVs, tablets and other phones pair with it like any wireless
  * controller and see the [GamepadReport.DESCRIPTOR] layout.
  *
- * Motion events go into a [GamepadMapper]; a 50 Hz tick sends a new input report whenever the
- * resulting [GamepadState] changes.
+ * [GamepadController] decides what to report; this class only delivers reports to the host.
  */
 @RequiresApi(Build.VERSION_CODES.P)
 @SuppressLint("MissingPermission") // Every entry point checks GamepadSupport.hasPermission() first.
 class GamepadHidDevice(private val context: Context) {
 
-    val mapper = GamepadMapper(GamepadSettings.load(context))
-
     private val adapter: BluetoothAdapter? =
         context.getSystemService(BluetoothManager::class.java)?.adapter
-    private val handler = Handler(Looper.getMainLooper())
     private var hid: BluetoothHidDevice? = null
     private var host: BluetoothDevice? = null
-    private var lastReport: ByteArray = GamepadState.NEUTRAL.toReport()
+    private var latest: ByteArray = GamepadState.NEUTRAL.toReport()
     private var started = false
-
-    private val tick = object : Runnable {
-        override fun run() {
-            sendIfChanged()
-            handler.postDelayed(this, TICK_MILLIS)
-        }
-    }
-
-    /** Called from the sensor or camera thread for every motion event. */
-    fun onMotion(event: MotionEvent) = mapper.onEvent(event, SystemClock.elapsedRealtime())
 
     fun start() {
         if (started) return
@@ -66,7 +48,6 @@ class GamepadHidDevice(private val context: Context) {
     fun stop() {
         if (!started) return
         started = false
-        handler.removeCallbacks(tick)
         hid?.let { proxy ->
             if (GamepadSupport.hasPermission(context)) {
                 host?.let { proxy.sendReport(it, GamepadReport.REPORT_ID, GamepadState.NEUTRAL.toReport()) }
@@ -77,7 +58,7 @@ class GamepadHidDevice(private val context: Context) {
         }
         hid = null
         host = null
-        mapper.reset()
+        latest = GamepadState.NEUTRAL.toReport()
         GamepadBus.setStatus(GamepadStatus.Off)
     }
 
@@ -90,12 +71,12 @@ class GamepadHidDevice(private val context: Context) {
         proxy.connect(device)
     }
 
-    private fun sendIfChanged() {
+    /** Sends a new input report to the connected host, if any. Main thread. */
+    fun send(report: ByteArray) {
+        latest = report
         val proxy = hid ?: return
         val target = host ?: return
-        val report = mapper.state(SystemClock.elapsedRealtime()).toReport()
-        if (report.contentEquals(lastReport)) return
-        if (proxy.sendReport(target, GamepadReport.REPORT_ID, report)) lastReport = report
+        proxy.sendReport(target, GamepadReport.REPORT_ID, report)
     }
 
     private val profileListener = object : BluetoothProfile.ServiceListener {
@@ -128,13 +109,10 @@ class GamepadHidDevice(private val context: Context) {
             if (!registered) {
                 // Another app holds the HID device role, or Bluetooth went away.
                 host = null
-                handler.removeCallbacks(tick)
                 GamepadBus.setStatus(GamepadStatus.Unavailable(GamepadStatus.Reason.NOT_SUPPORTED))
                 return
             }
             GamepadBus.setStatus(GamepadStatus.WaitingForHost)
-            handler.removeCallbacks(tick)
-            handler.post(tick)
             val reconnect = pluggedDevice?.address ?: GamepadSettings.lastHost(context)
             reconnect?.let(::connect)
         }
@@ -144,7 +122,7 @@ class GamepadHidDevice(private val context: Context) {
             when (state) {
                 BluetoothProfile.STATE_CONNECTED -> {
                     host = device
-                    lastReport = ByteArray(0) // force a fresh report to the new host
+                    hid?.sendReport(device, GamepadReport.REPORT_ID, latest)
                     GamepadSettings.setLastHost(context, device.address)
                     GamepadBus.setStatus(GamepadStatus.Connected(device.name ?: device.address))
                 }
@@ -158,7 +136,7 @@ class GamepadHidDevice(private val context: Context) {
         override fun onGetReport(device: BluetoothDevice, type: Byte, id: Byte, bufferSize: Int) {
             val proxy = hid ?: return
             if (type == BluetoothHidDevice.REPORT_TYPE_INPUT && id.toInt() == GamepadReport.REPORT_ID) {
-                proxy.replyReport(device, type, id, mapper.state(SystemClock.elapsedRealtime()).toReport())
+                proxy.replyReport(device, type, id, latest)
             } else {
                 proxy.reportError(device, BluetoothHidDevice.ERROR_RSP_INVALID_RPT_ID)
             }
@@ -171,7 +149,6 @@ class GamepadHidDevice(private val context: Context) {
     }
 
     companion object {
-        private const val TICK_MILLIS = 20L
         private const val SDP_NAME = "Roaming Gamepad"
         private const val SDP_DESCRIPTION = "Motion controlled gamepad"
         private const val SDP_PROVIDER = "Roaming"

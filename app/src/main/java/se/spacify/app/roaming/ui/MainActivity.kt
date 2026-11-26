@@ -35,6 +35,9 @@ import se.spacify.app.roaming.gamepad.GamepadMapping
 import se.spacify.app.roaming.gamepad.GamepadSettings
 import se.spacify.app.roaming.gamepad.GamepadStatus
 import se.spacify.app.roaming.gamepad.GamepadSupport
+import se.spacify.app.roaming.gamepad.LocalGamepadStatus
+import se.spacify.app.roaming.gamepad.local.LocalGamepadSupport
+import rikka.shizuku.Shizuku
 import se.spacify.app.roaming.motion.MotionBus
 import se.spacify.app.roaming.motion.MotionType
 import se.spacify.app.roaming.motion.StepSensorSource
@@ -65,6 +68,15 @@ class MainActivity : AppCompatActivity() {
             if (results.values.all { it }) showPairedDevices()
             else Toast.makeText(this, R.string.gamepad_unavailable_permission, Toast.LENGTH_LONG).show()
         }
+
+    private val shizukuPermissionListener = Shizuku.OnRequestPermissionResultListener { requestCode, result ->
+        if (requestCode != SHIZUKU_REQUEST) return@OnRequestPermissionResultListener
+        if (result != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, R.string.local_gamepad_no_permission, Toast.LENGTH_LONG).show()
+        }
+        // Start either way: tracking and the broadcast work without the phone gamepad.
+        launchService()
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -99,10 +111,14 @@ class MainActivity : AppCompatActivity() {
                         binding.switchSteps.isEnabled = !running && hasStepDetector
                         binding.switchCamera.isEnabled = !running
                         binding.switchGamepad.isEnabled = !running && GamepadSupport.isSupported()
+                        binding.switchGamepadLocal.isEnabled = !running
                     }
                 }
                 launch {
                     GamepadBus.status.collect { binding.textGamepadStatus.text = describe(it) }
+                }
+                launch {
+                    GamepadBus.localStatus.collect { binding.textLocalStatus.text = describeLocal(it) }
                 }
                 launch {
                     MotionBus.latest.collect { event ->
@@ -128,9 +144,29 @@ class MainActivity : AppCompatActivity() {
         if (toRequest.isEmpty()) startTracking() else permissionLauncher.launch(toRequest.toTypedArray())
     }
 
+    override fun onDestroy() {
+        Shizuku.removeRequestPermissionResultListener(shizukuPermissionListener)
+        super.onDestroy()
+    }
+
     private fun startTracking() {
+        // The phone gamepad needs Roaming to be allowed in Shizuku; ask first if Shizuku is running.
+        if (binding.switchGamepadLocal.isChecked && LocalGamepadSupport.isShizukuRunning() && !Shizuku.isPreV11() &&
+            Shizuku.checkSelfPermission() != PackageManager.PERMISSION_GRANTED
+        ) {
+            Shizuku.requestPermission(SHIZUKU_REQUEST)
+            return
+        }
+        launchService()
+    }
+
+    private fun launchService() {
         MotionService.start(
-            this, binding.switchSteps.isChecked, binding.switchCamera.isChecked, binding.switchGamepad.isChecked,
+            this,
+            binding.switchSteps.isChecked,
+            binding.switchCamera.isChecked,
+            useGamepad = binding.switchGamepad.isChecked,
+            useLocalGamepad = binding.switchGamepadLocal.isChecked,
         )
     }
 
@@ -152,17 +188,35 @@ class MainActivity : AppCompatActivity() {
     // --- Gamepad mode ---
 
     private fun setUpGamepad() {
-        if (!GamepadSupport.isSupported()) {
+        Shizuku.addRequestPermissionResultListener(shizukuPermissionListener)
+        if (GamepadSupport.isSupported()) {
+            binding.switchGamepad.isChecked = GamepadSettings.isEnabled(this)
+        } else {
             binding.switchGamepad.isChecked = false
             binding.switchGamepad.isEnabled = false
             binding.textGamepadHint.setText(R.string.gamepad_unavailable_old_android)
-            return
         }
-        binding.switchGamepad.isChecked = GamepadSettings.isEnabled(this)
-        binding.gamepadSection.visibility = if (binding.switchGamepad.isChecked) View.VISIBLE else View.GONE
+        binding.switchGamepadLocal.isChecked = GamepadSettings.isLocalEnabled(this)
+        updateGamepadSection()
         binding.switchGamepad.setOnCheckedChangeListener { _, checked ->
             GamepadSettings.setEnabled(this, checked)
-            binding.gamepadSection.visibility = if (checked) View.VISIBLE else View.GONE
+            updateGamepadSection()
+        }
+        binding.switchGamepadLocal.setOnCheckedChangeListener { _, checked ->
+            GamepadSettings.setLocalEnabled(this, checked)
+            updateGamepadSection()
+        }
+        binding.buttonShizukuHelp.setOnClickListener {
+            val launch = packageManager.getLaunchIntentForPackage(LocalGamepadSupport.SHIZUKU_PACKAGE)
+            if (launch != null && LocalGamepadSupport.isShizukuInstalled(this) && !LocalGamepadSupport.isShizukuRunning()) {
+                startActivity(launch)
+            } else {
+                try {
+                    startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(LOCAL_GAMEPAD_DOCS)))
+                } catch (_: android.content.ActivityNotFoundException) {
+                    Toast.makeText(this, LOCAL_GAMEPAD_DOCS, Toast.LENGTH_LONG).show()
+                }
+            }
         }
         binding.buttonDiscoverable.setOnClickListener {
             val missing = discoverablePermissions().filterNot(::isGranted)
@@ -181,6 +235,30 @@ class MainActivity : AppCompatActivity() {
             buildMappingRows(GamepadMapping.DEFAULT)
         }
         buildMappingRows(GamepadSettings.load(this))
+    }
+
+    private fun updateGamepadSection() {
+        val bluetooth = binding.switchGamepad.isChecked
+        val local = binding.switchGamepadLocal.isChecked
+        binding.gamepadSection.visibility = if (bluetooth || local) View.VISIBLE else View.GONE
+        binding.bluetoothControls.visibility = if (bluetooth) View.VISIBLE else View.GONE
+        binding.localControls.visibility = if (local) View.VISIBLE else View.GONE
+    }
+
+    private fun describeLocal(status: LocalGamepadStatus): String = when (status) {
+        LocalGamepadStatus.Off -> getString(R.string.local_gamepad_status_off)
+        LocalGamepadStatus.Starting -> getString(R.string.local_gamepad_status_starting)
+        LocalGamepadStatus.Active -> getString(R.string.local_gamepad_status_active)
+        is LocalGamepadStatus.Failed -> getString(R.string.local_gamepad_status_failed, status.message)
+        is LocalGamepadStatus.Unavailable -> getString(
+            when (status.reason) {
+                LocalGamepadStatus.Reason.SHIZUKU_NOT_RUNNING ->
+                    if (LocalGamepadSupport.isShizukuInstalled(this)) R.string.local_gamepad_not_running
+                    else R.string.local_gamepad_not_installed
+                LocalGamepadStatus.Reason.SHIZUKU_TOO_OLD -> R.string.local_gamepad_too_old
+                LocalGamepadStatus.Reason.NO_PERMISSION -> R.string.local_gamepad_no_permission
+            }
+        )
     }
 
     /** One row per motion type, each with a dropdown of gamepad controls. */
@@ -309,5 +387,10 @@ class MainActivity : AppCompatActivity() {
         GamepadControl.R3 -> R.string.control_r3
         GamepadControl.SELECT -> R.string.control_select
         GamepadControl.START -> R.string.control_start
+    }
+
+    private companion object {
+        const val SHIZUKU_REQUEST = 7301
+        const val LOCAL_GAMEPAD_DOCS = "https://drsounds.github.io/roaming-android-app/gamepad/this-phone"
     }
 }

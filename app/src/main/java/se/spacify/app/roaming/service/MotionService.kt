@@ -18,7 +18,7 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 import se.spacify.app.roaming.R
-import se.spacify.app.roaming.gamepad.GamepadHidDevice
+import se.spacify.app.roaming.gamepad.GamepadController
 import se.spacify.app.roaming.gamepad.GamepadSettings
 import se.spacify.app.roaming.gamepad.GamepadSupport
 import se.spacify.app.roaming.motion.CameraPoseSource
@@ -40,7 +40,7 @@ class MotionService : LifecycleService() {
     private var stepSource: StepSensorSource? = null
     private var cameraSource: CameraPoseSource? = null
     private var overlay: OverlayBubble? = null
-    private var gamepad: GamepadHidDevice? = null
+    private var gamepad: GamepadController? = null
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
@@ -63,8 +63,9 @@ class MotionService : LifecycleService() {
         val useSteps = intent?.getBooleanExtra(EXTRA_USE_STEPS, true) ?: true
         val useCamera = intent?.getBooleanExtra(EXTRA_USE_CAMERA, false) ?: false
         val useGamepad = (intent?.getBooleanExtra(EXTRA_USE_GAMEPAD, false) ?: false) && GamepadSupport.isSupported()
+        val useLocalGamepad = intent?.getBooleanExtra(EXTRA_USE_LOCAL_GAMEPAD, false) ?: false
         try {
-            startInForeground(useSteps, useCamera, useGamepad)
+            startInForeground(useSteps, useCamera, useGamepad, useLocalGamepad)
         } catch (e: Exception) {
             // Missing runtime permission or a background start the OS refused: never track silently.
             Log.e(TAG, "Could not start foreground tracking", e)
@@ -73,8 +74,8 @@ class MotionService : LifecycleService() {
         }
 
         val broadcaster = MotionBroadcaster(this)
-        if (useGamepad && Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-            gamepad = GamepadHidDevice(this).also { pad ->
+        if (useGamepad || useLocalGamepad) {
+            gamepad = GamepadController(this, useBluetooth = useGamepad, useLocal = useLocalGamepad).also { pad ->
                 pad.start()
                 lifecycleScope.launch { GamepadSettings.mapping.collect { pad.mapper.mapping = it } }
             }
@@ -117,7 +118,7 @@ class MotionService : LifecycleService() {
         super.onDestroy()
     }
 
-    private fun startInForeground(useSteps: Boolean, useCamera: Boolean, useGamepad: Boolean) {
+    private fun startInForeground(useSteps: Boolean, useCamera: Boolean, useGamepad: Boolean, useLocalGamepad: Boolean) {
         createChannel()
         var types = 0
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
@@ -131,7 +132,7 @@ class MotionService : LifecycleService() {
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && useCamera) {
             types = ServiceInfo.FOREGROUND_SERVICE_TYPE_CAMERA
         }
-        ServiceCompat.startForeground(this, NOTIFICATION_ID, buildNotification(useSteps, useCamera, useGamepad), types)
+        ServiceCompat.startForeground(this, NOTIFICATION_ID, buildNotification(useSteps, useCamera, useGamepad || useLocalGamepad), types)
     }
 
     private fun buildNotification(useSteps: Boolean, useCamera: Boolean, useGamepad: Boolean): Notification {
@@ -176,14 +177,22 @@ class MotionService : LifecycleService() {
         const val EXTRA_USE_STEPS = "use_steps"
         const val EXTRA_USE_CAMERA = "use_camera"
         const val EXTRA_USE_GAMEPAD = "use_gamepad"
+        const val EXTRA_USE_LOCAL_GAMEPAD = "use_local_gamepad"
         const val ACTION_CONNECT_HOST = "se.spacify.app.roaming.action.CONNECT_HOST"
         const val EXTRA_HOST_ADDRESS = "host_address"
 
-        fun start(context: Context, useSteps: Boolean, useCamera: Boolean, useGamepad: Boolean = false) {
+        fun start(
+            context: Context,
+            useSteps: Boolean,
+            useCamera: Boolean,
+            useGamepad: Boolean = false,
+            useLocalGamepad: Boolean = false,
+        ) {
             val intent = Intent(context, MotionService::class.java)
                 .putExtra(EXTRA_USE_STEPS, useSteps)
                 .putExtra(EXTRA_USE_CAMERA, useCamera)
                 .putExtra(EXTRA_USE_GAMEPAD, useGamepad)
+                .putExtra(EXTRA_USE_LOCAL_GAMEPAD, useLocalGamepad)
             ContextCompat.startForegroundService(context, intent)
         }
 

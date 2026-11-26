@@ -18,6 +18,7 @@ import org.json.JSONObject
 object GamepadSettings {
     private const val PREFS = "gamepad"
     private const val KEY_ENABLED = "enabled"
+    private const val KEY_LOCAL_ENABLED = "local_enabled"
     private const val KEY_MAPPING = "mapping"
     private const val KEY_LAST_HOST = "last_host"
 
@@ -55,6 +56,12 @@ object GamepadSettings {
     fun setEnabled(context: Context, enabled: Boolean) =
         prefs(context).edit().putBoolean(KEY_ENABLED, enabled).apply()
 
+    /** Whether the gamepad for apps on this phone (through Shizuku) is on. */
+    fun isLocalEnabled(context: Context) = prefs(context).getBoolean(KEY_LOCAL_ENABLED, false)
+
+    fun setLocalEnabled(context: Context, enabled: Boolean) =
+        prefs(context).edit().putBoolean(KEY_LOCAL_ENABLED, enabled).apply()
+
     fun lastHost(context: Context): String? = prefs(context).getString(KEY_LAST_HOST, null)
 
     fun setLastHost(context: Context, address: String?) =
@@ -81,6 +88,22 @@ sealed interface GamepadStatus {
     enum class Reason { OLD_ANDROID, NO_BLUETOOTH, BLUETOOTH_OFF, NO_PERMISSION, NOT_SUPPORTED }
 }
 
+/** State of the virtual gamepad for apps on this phone. */
+sealed interface LocalGamepadStatus {
+    data object Off : LocalGamepadStatus
+    data object Starting : LocalGamepadStatus
+
+    /** The virtual gamepad exists; apps on this phone receive its input. */
+    data object Active : LocalGamepadStatus
+
+    data class Unavailable(val reason: Reason) : LocalGamepadStatus
+
+    /** Shizuku ran the service, but creating the device failed; [message] has the details. */
+    data class Failed(val message: String) : LocalGamepadStatus
+
+    enum class Reason { SHIZUKU_NOT_RUNNING, SHIZUKU_TOO_OLD, NO_PERMISSION }
+}
+
 /** In-process gamepad status, like [se.spacify.app.roaming.motion.MotionBus] for motion. */
 object GamepadBus {
     private val _status = MutableStateFlow<GamepadStatus>(GamepadStatus.Off)
@@ -88,5 +111,12 @@ object GamepadBus {
 
     fun setStatus(status: GamepadStatus) {
         _status.value = status
+    }
+
+    private val _localStatus = MutableStateFlow<LocalGamepadStatus>(LocalGamepadStatus.Off)
+    val localStatus: StateFlow<LocalGamepadStatus> = _localStatus.asStateFlow()
+
+    fun setLocalStatus(status: LocalGamepadStatus) {
+        _localStatus.value = status
     }
 }
