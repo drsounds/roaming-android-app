@@ -19,4 +19,51 @@
     <string name="notification_channel">Motion tracking</string>
     <string name="notification_title">Roaming is tracking your motion</string>
     <string name="notification_text">Using %1$s. Tap Stop to end.</string>
+
+    <!-- Gamepad mode -->
+    <string name="gamepad_short">Gamepad</string>
+    <string name="gamepad_switch">Act as a Bluetooth gamepad</string>
+    <string name="gamepad_hint">Computers, Android TVs, tablets and other phones see Roaming as a standard wireless gamepad. Games on this phone can\'t use it; they listen to the broadcast instead.</string>
+    <string name="gamepad_title">Gamepad</string>
+    <string name="gamepad_status_off">Gamepad is off. It starts with tracking.</string>
+    <string name="gamepad_status_starting">Starting the gamepad…</string>
+    <string name="gamepad_status_waiting">Waiting for a device. Pair \"%1$s\" from its Bluetooth settings, or connect to a paired device below.</string>
+    <string name="gamepad_status_connected">Connected to %1$s</string>
+    <string name="gamepad_unavailable_old_android">Gamepad mode needs Android 9 or later.</string>
+    <string name="gamepad_unavailable_no_bluetooth">This device has no Bluetooth.</string>
+    <string name="gamepad_unavailable_off">Turn on Bluetooth, then start tracking again.</string>
+    <string name="gamepad_unavailable_permission">Roaming needs the Nearby devices permission to act as a gamepad.</string>
+    <string name="gamepad_unavailable_not_supported">This phone doesn\'t allow apps to act as a Bluetooth gamepad, or another app is using that role.</string>
+    <string name="gamepad_discoverable">Make this phone discoverable</string>
+    <string name="gamepad_connect_paired">Connect to a paired device</string>
+    <string name="gamepad_connect_title">Connect to</string>
+    <string name="gamepad_connect_needs_tracking">Start tracking first, then connect.</string>
+    <string name="gamepad_no_paired_devices">No paired devices. Make this phone discoverable and pair it from the other device.</string>
+    <string name="gamepad_mapping">Motion to gamepad</string>
+    <string name="gamepad_reset_mapping">Reset to defaults</string>
+
+    <string name="motion_step">Single step</string>
+    <string name="motion_walking">Walking</string>
+    <string name="motion_running">Running</string>
+    <string name="motion_jumping">Jumping</string>
+    <string name="motion_squatting">Squatting</string>
+    <string name="motion_leaning">Leaning</string>
+    <string name="motion_arms_raised">Arms raised</string>
+
+    <string name="control_none">Nothing</string>
+    <string name="control_left_stick">Left stick (follows direction)</string>
+    <string name="control_right_stick">Right stick (follows direction)</string>
+    <string name="control_dpad">D-pad (follows direction)</string>
+    <string name="control_left_trigger">Left trigger (by intensity)</string>
+    <string name="control_right_trigger">Right trigger (by intensity)</string>
+    <string name="control_a">A button</string>
+    <string name="control_b">B button</string>
+    <string name="control_x">X button</string>
+    <string name="control_y">Y button</string>
+    <string name="control_l1">Left bumper (L1)</string>
+    <string name="control_r1">Right bumper (R1)</string>
+    <string name="control_l3">Left stick press (L3)</string>
+    <string name="control_r3">Right stick press (R3)</string>
+    <string name="control_select">Select / Back</string>
+    <string name="control_start">Start</string>
 </resources>
