@@ -70,7 +70,7 @@ An event is sent when the motion type or direction changes, when the intensity c
 | Input | What it detects |
 | --- | --- |
 | Step sensor | `step`, `walking` / `running` (from cadence), `jumping` (vertical acceleration spike), and `left` / `right` from tilting the phone, which also gives `leaning` when standing still |
-| Camera | `jumping` and `squatting` (hip height against a baseline), `leaning` left/right, `arms_raised`, and `walking` / `running` in place (alternating knee lifts) |
+| Camera | `jumping` and `squatting` (hip height against a baseline), `leaning` left/right, `arms_raised`, and `walking` / `running` in place (alternating knee lifts). With only the head and shoulders in view (selfie mode, or a phone on an elliptical or bike console) it reports `walking` / `running` from the rhythm and intensity of upper-body movement |
 
 ## Listening from your game
 
@@ -116,7 +116,7 @@ It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browser
 4. Tap **Start tracking**. Roaming shows an ongoing notification with a **Stop** action; broadcasts are only sent while it is there.
 5. Switch to your game.
 
-For the camera, prop the phone up so your whole body (at least head to hips, ideally to the knees) is in view of the front camera.
+For the camera, prop the phone up so your whole body (at least head to hips, ideally to the knees) is in view of the front camera. For an elliptical, exercise bike or stepper, it's enough to have your head and shoulders in view: mount the phone on the console, or hold it in selfie mode. Arms in view help, as their swing is the clearest rhythm.
 
 # Documentation
 
@@ -126,7 +126,7 @@ Developer docs for the broadcast, with integration guides for Kotlin, Java, Unit
 
 * Only local. The app has no network permission (it is explicitly removed from the merged manifest).
 * No GPS coordinate
-* No health data. Nothing is stored; only a few seconds of step timestamps are kept in memory to compute cadence. Camera frames are analyzed in memory and dropped immediately.
+* No health data. Nothing is stored; only a few seconds of step timestamps are kept in memory to compute cadence. The camera input also reads the gyroscope, only to tell whether the phone itself is moving. Camera frames are analyzed in memory and dropped immediately.
 * Open Source
 * Use a foreground service with an ongoing notification so it only broadcasts while that notification (and its Stop pending intent) is live, so the user always knows it is tracking
 
