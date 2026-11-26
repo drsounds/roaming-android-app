@@ -17,7 +17,7 @@ intensity
 
 which are sent as broadcast intents
 
-````se.roaming.app.event.MOTION````
+````se.spacify.app.roaming.event.MOTION````
 
 with data
 
@@ -46,5 +46,7 @@ intensity
 
 Apache license
 
+# CI 
+It should have a CI GitHub Actions workflow for automatically building this app
 
 
