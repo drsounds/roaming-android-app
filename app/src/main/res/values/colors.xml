@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="roaming_green">#FF1B8A5A</color>
+    <color name="roaming_green_dark">#FF0F5C3B</color>
+    <color name="bubble_background">#E61B8A5A</color>
+    <color name="white">#FFFFFFFF</color>
+</resources>

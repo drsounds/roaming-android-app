@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Roaming</string>
+    <string name="tagline">Turn your body into a game controller. Roaming detects your motion on this device and broadcasts it to other apps.</string>
+    <string name="input_steps">Step sensor</string>
+    <string name="input_camera">Camera</string>
+    <string name="input_steps_hint">Hardware step detector plus device tilt. Keep the phone in your hand or pocket.</string>
+    <string name="input_camera_hint">On-device pose detection with the front camera. Stand back so your body is in view. Frames never leave the device.</string>
+    <string name="start">Start tracking</string>
+    <string name="stop">Stop</string>
+    <string name="status_idle">Not tracking</string>
+    <string name="status_running">Tracking. Broadcasting se.spacify.app.roaming.event.MOTION</string>
+    <string name="overlay_permission">Allow the motion bubble over other apps</string>
+    <string name="choose_input">Choose at least one input</string>
+    <string name="permission_denied">Roaming needs this permission to detect motion</string>
+    <string name="no_step_sensor">This device has no step detector; use the camera instead</string>
+    <string name="last_event">Last event</string>
+    <string name="privacy">Private by design: everything runs on this device, there is no network access, no location and no health data is stored.</string>
+    <string name="notification_channel">Motion tracking</string>
+    <string name="notification_title">Roaming is tracking your motion</string>
+    <string name="notification_text">Using %1$s. Tap Stop to end.</string>
+</resources>
