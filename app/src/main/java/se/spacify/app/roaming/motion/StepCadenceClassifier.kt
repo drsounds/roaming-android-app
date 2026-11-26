@@ -13,7 +13,12 @@ import kotlin.math.sqrt
  */
 class StepCadenceClassifier(
     private val windowMillis: Long = 4_000L,
+    /** Longest time without a step before going IDLE (used until there is a step rhythm). */
     private val idleAfterMillis: Long = 2_000L,
+    /** Shortest time without a step before going IDLE, for fast cadences. */
+    private val minIdleAfterMillis: Long = 700L,
+    /** With a rhythm, go IDLE after this many missed step intervals. */
+    private val idleAfterIntervals: Float = 2f,
     private val runningCadence: Float = 140f,
     private val maxCadence: Float = 200f,
     private val tiltThreshold: Float = 0.35f,
@@ -42,13 +47,19 @@ class StepCadenceClassifier(
         gravity = floatArrayOf(x, y, z)
     }
 
+    /**
+     * Component of linear acceleration along "up", in m/s², or null before gravity is known.
+     * Up is the axis of the gravity sensor's reading, which points up when the device is at rest.
+     */
+    fun verticalAcceleration(x: Float, y: Float, z: Float): Float? {
+        val g = gravity
+        val norm = sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]).takeIf { it > 0.1f } ?: return null
+        return (x * g[0] + y * g[1] + z * g[2]) / norm
+    }
+
     /** Returns true when this sample starts a jump. */
     fun onLinearAcceleration(x: Float, y: Float, z: Float, nowMillis: Long): Boolean {
-        val g = gravity
-        val norm = sqrt(g[0] * g[0] + g[1] * g[1] + g[2] * g[2]).takeIf { it > 0.1f } ?: return false
-        // Component of linear acceleration along "up" (opposite to gravity's pull is the same axis
-        // as the gravity sensor's reading, which points up when the device is at rest).
-        val vertical = (x * g[0] + y * g[1] + z * g[2]) / norm
+        val vertical = verticalAcceleration(x, y, z) ?: return false
         if (vertical > jumpThreshold && nowMillis > jumpUntil) {
             jumpUntil = nowMillis + jumpHoldMillis
             jumpIntensity = ((vertical - jumpThreshold) / (jumpThreshold * 2) + 0.4f).coerceIn(0f, 1f)
@@ -61,7 +72,7 @@ class StepCadenceClassifier(
         if (nowMillis <= jumpUntil) return MotionState.of(MotionType.JUMPING, Direction.UP, jumpIntensity)
         prune(nowMillis)
         val lastStep = steps.lastOrNull()
-        if (lastStep == null || nowMillis - lastStep > idleAfterMillis) {
+        if (lastStep == null || nowMillis - lastStep > idleAfter()) {
             val tilt = tiltDirection()
             return if (tilt != Direction.NONE) {
                 MotionState.of(MotionType.LEANING, tilt, tiltAmount())
@@ -74,6 +85,17 @@ class StepCadenceClassifier(
         val cadence = cadence(nowMillis)
         val type = if (cadence >= runningCadence) MotionType.RUNNING else MotionType.WALKING
         return MotionState.of(type, direction0, cadence / maxCadence)
+    }
+
+    /**
+     * How long without a step means the user stopped. Once there is a rhythm this follows the
+     * cadence (two missed steps), so stopping is reported quickly when walking or running, while
+     * a single step or a very slow walk still gets the full [idleAfterMillis].
+     */
+    private fun idleAfter(): Long {
+        if (steps.size < 2) return idleAfterMillis
+        val interval = steps.last() - steps[steps.size - 2]
+        return (interval * idleAfterIntervals).toLong().coerceIn(minIdleAfterMillis, idleAfterMillis)
     }
 
     private fun tiltAmount(): Float {

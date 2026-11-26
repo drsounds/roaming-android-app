@@ -63,7 +63,9 @@ The intent carries the full JSON as the `data` string extra, for example:
 }
 ```
 
-For convenience the same values are also available as flat extras: `motion_type`, `direction`, `intensity` (float), `vector_x`, `vector_y`, `vector_z`, `prev_motion_type`, `prev_direction`, `prev_intensity`, `timestamp` (long, `SystemClock.elapsedRealtime()`) and `source` (`step_sensor` or `camera`).
+For convenience the same values are also available as flat extras: `motion_type`, `direction`, `intensity` (float), `vector_x`, `vector_y`, `vector_z`, `prev_motion_type`, `prev_direction`, `prev_intensity`, `timestamp` (long, `SystemClock.elapsedRealtime()` when the motion was detected), `sent_at` (long, same clock, when Roaming sent it) and `source` (`step_sensor` or `camera`).
+
+For the lowest latency, games can instead bind to Roaming's motion service (action `se.spacify.app.roaming.action.BIND_MOTION`) and get each event as a direct `Messenger` callback with the same extras. See the docs page "Low-latency connection".
 
 An event is sent when the motion type or direction changes, when the intensity changes noticeably, and once for every detected step, so a game gets one event per physical action.
 
