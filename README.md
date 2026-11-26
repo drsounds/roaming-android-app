@@ -122,7 +122,7 @@ For the camera, prop the phone up so your whole body (at least head to hips, ide
 
 # Building
 
-Requirements: JDK 17 and the Android SDK (API 35).
+Requirements: JDK 17 and the Android SDK (API 36).
 
 ```sh
 ./gradlew testDebugUnitTest   # unit tests for the motion classifiers
