@@ -25,14 +25,7 @@
     <string name="safety_card_text">Only use Roaming where you have room to move and nothing to trip over or bump into, away from traffic, stairs, water and other people. Keep track of your surroundings at all times.</string>
     <string name="safety_read_disclaimer">Safety and disclaimer</string>
     <string name="safety_dialog_title">Safety warning and disclaimer</string>
-    <string name="safety_dialog_text">Roaming turns your body movement into game input. Moving while you look at a screen can lead to falls, collisions and injuries.
-
-• Only use Roaming in a safe environment: a clear, flat area with enough space around you, away from traffic, stairs, open water, furniture, pets and other people.
-• Keep track of your surroundings at all times. The motion bubble regularly reminds you to look up.
-• Stop immediately if you feel pain, dizziness or shortness of breath, and check with a doctor before starting a new exercise routine.
-• Make sure the phone is mounted or held securely so it can't fall.
-
-DISCLAIMER: Roaming is provided "as is", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non-infringement. You are solely responsible for all use of the app and for taking the precautions needed to use it safely. To the fullest extent permitted by law, the authors and publisher are not liable for any injury, damage or loss arising from its use.</string>
+    <string name="safety_dialog_text">Roaming turns your body movement into game input. Moving while you look at a screen can lead to falls, collisions and injuries.\n\n• Only use Roaming in a safe environment: a clear, flat area with enough space around you, away from traffic, stairs, open water, furniture, pets and other people.\n• Keep track of your surroundings at all times. The motion bubble regularly reminds you to look up.\n• Stop immediately if you feel pain, dizziness or shortness of breath, and check with a doctor before starting a new exercise routine.\n• Make sure the phone is mounted or held securely so it can\'t fall.\n\nDISCLAIMER: Roaming is provided \"as is\", without warranty of any kind, express or implied, including but not limited to the warranties of merchantability, fitness for a particular purpose and non-infringement. You are solely responsible for all use of the app and for taking the precautions needed to use it safely. To the fullest extent permitted by law, the authors and publisher are not liable for any injury, damage or loss arising from its use.</string>
     <string name="safety_accept">I understand and accept</string>
     <string name="safety_decline">Exit</string>
     <string name="safety_close">Close</string>
