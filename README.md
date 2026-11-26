@@ -108,13 +108,20 @@ Roaming can also act as a **Bluetooth gamepad** (Android 9+). A computer, Androi
 
 It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browsers and Steam. Consoles (PlayStation, Xbox, Switch) only accept their own controllers, and games on the same phone can't receive it (Android doesn't let apps inject gamepad input into other apps), so they should use the broadcast. See the [gamepad docs](https://drsounds.github.io/roaming-android-app/gamepad/overview) for pairing, compatibility and the HID layout.
 
+# Safety and disclaimer
+
+**Roaming is provided "as is", without any warranty. You are responsible for all use of the app.** Moving while looking at a screen can lead to falls and collisions, so only use Roaming in a safe environment (a clear, flat area away from traffic, stairs, water, furniture and other people) and keep track of your surroundings at all times.
+
+In the app, the safety warning and disclaimer must be accepted on first launch before tracking can start, and can be read again from **Safety and disclaimer** on the main screen. While tracking, the motion bubble regularly turns into a "Watch your surroundings" reminder (every 5 minutes by default; 2 to 30 minutes can be chosen in the app). See the [safety docs](https://drsounds.github.io/roaming-android-app/safety).
+
 # Using the app
 
 1. Install the debug APK from the latest CI run (or build it, see below).
-2. Choose the inputs: Step sensor, Camera, or both.
-3. Optionally turn on **Act as a Bluetooth gamepad**, and allow the overlay bubble ("display over other apps").
-4. Tap **Start tracking**. Roaming shows an ongoing notification with a **Stop** action; broadcasts are only sent while it is there.
-5. Switch to your game.
+2. Read and accept the safety warning and disclaimer.
+3. Choose the inputs: Step sensor, Camera, or both.
+4. Optionally turn on **Act as a Bluetooth gamepad**, and allow the overlay bubble ("display over other apps").
+5. Tap **Start tracking**. Roaming shows an ongoing notification with a **Stop** action; broadcasts are only sent while it is there.
+6. Switch to your game, in a safe place with room to move.
 
 For the camera, prop the phone up so your whole body (at least head to hips, ideally to the knees) is in view of the front camera. For an elliptical, exercise bike or stepper, it's enough to have your head and shoulders in view: mount the phone on the console, or hold it in selfie mode. Arms in view help, as their swing is the clearest rhythm.
 
@@ -144,7 +151,8 @@ Project layout:
 * `app/src/main/java/se/spacify/app/roaming/motion`: event model, classifiers (pure Kotlin, unit tested), sensor and camera sources, broadcaster
 * `app/src/main/java/se/spacify/app/roaming/gamepad`: motion-to-gamepad mapping and HID report (pure Kotlin, unit tested) and the Bluetooth HID gamepad
 * `.../service/MotionService.kt`: the foreground service
-* `.../overlay/OverlayBubble.kt`: the on-screen bubble
+* `.../overlay/OverlayBubble.kt`: the on-screen bubble, including the surroundings reminder
+* `.../safety/SafetySettings.kt`: disclaimer acceptance and the reminder interval
 * `.../ui/MainActivity.kt`: start/stop screen and live event view
 
 # License
