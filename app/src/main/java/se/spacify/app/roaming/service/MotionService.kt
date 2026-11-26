@@ -15,7 +15,9 @@ import androidx.core.app.ServiceCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import se.spacify.app.roaming.R
 import se.spacify.app.roaming.gamepad.GamepadHidDevice
@@ -28,6 +30,7 @@ import se.spacify.app.roaming.motion.MotionEmitter
 import se.spacify.app.roaming.motion.MotionEvent
 import se.spacify.app.roaming.motion.StepSensorSource
 import se.spacify.app.roaming.overlay.OverlayBubble
+import se.spacify.app.roaming.safety.SafetySettings
 import se.spacify.app.roaming.ui.MainActivity
 
 /**
@@ -98,6 +101,16 @@ class MotionService : LifecycleService() {
                 bubble.show()
                 lifecycleScope.launch {
                     MotionBus.latest.filterNotNull().collect { bubble.update(it.new) }
+                }
+                // Remind the user to keep track of their surroundings: once right away, then
+                // regularly for as long as tracking runs. The interval is re-read every time, so
+                // a change in the app applies without restarting tracking.
+                lifecycleScope.launch {
+                    bubble.showSafetyReminder()
+                    while (isActive) {
+                        delay(SafetySettings.reminderInterval(this@MotionService).millis)
+                        bubble.showSafetyReminder()
+                    }
                 }
             }
         }

@@ -38,6 +38,8 @@ import se.spacify.app.roaming.gamepad.GamepadSupport
 import se.spacify.app.roaming.motion.MotionBus
 import se.spacify.app.roaming.motion.MotionType
 import se.spacify.app.roaming.motion.StepSensorSource
+import se.spacify.app.roaming.safety.ReminderInterval
+import se.spacify.app.roaming.safety.SafetySettings
 import se.spacify.app.roaming.service.MotionService
 
 class MainActivity : AppCompatActivity() {
@@ -80,6 +82,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         setUpGamepad()
+        setUpSafety()
 
         binding.buttonToggle.setOnClickListener {
             if (MotionBus.running.value) MotionService.stop(this) else requestAndStart()
@@ -119,6 +122,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun requestAndStart() {
+        if (!SafetySettings.isDisclaimerAccepted(this)) {
+            Toast.makeText(this, R.string.safety_must_accept, Toast.LENGTH_SHORT).show()
+            showSafetyDialog(requireAcceptance = true)
+            return
+        }
         if (!binding.switchSteps.isChecked && !binding.switchCamera.isChecked) {
             Toast.makeText(this, R.string.choose_input, Toast.LENGTH_SHORT).show()
             return
@@ -148,6 +156,59 @@ class MainActivity : AppCompatActivity() {
 
     private fun isGranted(permission: String) =
         ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+
+    // --- Safety ---
+
+    private var safetyDialog: AlertDialog? = null
+
+    private fun setUpSafety() {
+        binding.buttonSafety.setOnClickListener {
+            showSafetyDialog(requireAcceptance = !SafetySettings.isDisclaimerAccepted(this))
+        }
+
+        val intervals = ReminderInterval.entries
+        binding.spinnerReminder.adapter = ArrayAdapter(
+            this, android.R.layout.simple_spinner_item,
+            intervals.map { getString(R.string.safety_reminder_every, it.minutes) },
+        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        binding.spinnerReminder.setSelection(intervals.indexOf(SafetySettings.reminderInterval(this)), false)
+        binding.spinnerReminder.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                SafetySettings.setReminderInterval(this@MainActivity, intervals[position])
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) = Unit
+        }
+
+        // First launch (or a changed disclaimer): it must be accepted before Roaming can be used.
+        if (!SafetySettings.isDisclaimerAccepted(this)) showSafetyDialog(requireAcceptance = true)
+    }
+
+    /**
+     * Shows the safety warning and disclaimer. With [requireAcceptance] the user can only accept it
+     * or leave the app; otherwise it is shown for reading and simply closes.
+     */
+    private fun showSafetyDialog(requireAcceptance: Boolean) {
+        if (safetyDialog?.isShowing == true) return
+        val builder = AlertDialog.Builder(this)
+            .setTitle(R.string.safety_dialog_title)
+            .setMessage(R.string.safety_dialog_text)
+        if (requireAcceptance) {
+            builder
+                .setCancelable(false)
+                .setPositiveButton(R.string.safety_accept) { _, _ -> SafetySettings.acceptDisclaimer(this) }
+                .setNegativeButton(R.string.safety_decline) { _, _ -> finish() }
+        } else {
+            builder.setPositiveButton(R.string.safety_close, null)
+        }
+        safetyDialog = builder.show()
+    }
+
+    override fun onDestroy() {
+        safetyDialog?.dismiss()
+        safetyDialog = null
+        super.onDestroy()
+    }
 
     // --- Gamepad mode ---
 

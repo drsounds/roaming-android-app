@@ -13,11 +13,21 @@ import se.spacify.app.roaming.R
 import se.spacify.app.roaming.motion.Direction
 import se.spacify.app.roaming.motion.MotionState
 import se.spacify.app.roaming.motion.MotionType
+import se.spacify.app.roaming.safety.SafetySettings
 
 /** A small draggable bubble drawn over other apps while Roaming is active. */
 class OverlayBubble(private val context: Context) {
     private val windowManager = context.getSystemService(Context.WINDOW_SERVICE) as WindowManager
     private var view: View? = null
+    private var lastState: MotionState = MotionState.IDLE
+    private var showingReminder = false
+    private val endReminder = Runnable {
+        showingReminder = false
+        view?.let { bubble ->
+            bubble.setBackgroundResource(R.drawable.bubble_background)
+            render(bubble, lastState)
+        }
+    }
     private val params = WindowManager.LayoutParams(
         WindowManager.LayoutParams.WRAP_CONTENT,
         WindowManager.LayoutParams.WRAP_CONTENT,
@@ -43,15 +53,40 @@ class OverlayBubble(private val context: Context) {
     fun update(state: MotionState) {
         val bubble = view ?: return
         bubble.post {
-            bubble.findViewById<TextView>(R.id.bubble_icon).text = iconFor(state)
-            bubble.findViewById<TextView>(R.id.bubble_label).text = state.motionType.wire.replace('_', ' ')
-            bubble.alpha = 0.6f + 0.4f * state.intensity
+            lastState = state
+            if (!showingReminder) render(bubble, state)
+        }
+    }
+
+    /**
+     * Briefly turns the bubble into a reminder to keep track of the surroundings, then goes back to
+     * showing the current motion. Motion updates that arrive meanwhile are kept, not lost.
+     */
+    fun showSafetyReminder() {
+        val bubble = view ?: return
+        bubble.post {
+            showingReminder = true
+            bubble.removeCallbacks(endReminder)
+            bubble.setBackgroundResource(R.drawable.bubble_background_warning)
+            bubble.alpha = 1f
+            bubble.findViewById<TextView>(R.id.bubble_icon).text = "\u26A0" // ⚠
+            bubble.findViewById<TextView>(R.id.bubble_label).setText(R.string.safety_reminder_bubble)
+            bubble.postDelayed(endReminder, SafetySettings.REMINDER_DISPLAY_MILLIS)
         }
     }
 
     fun hide() {
-        view?.let { runCatching { windowManager.removeView(it) } }
+        view?.let {
+            it.removeCallbacks(endReminder)
+            runCatching { windowManager.removeView(it) }
+        }
         view = null
+    }
+
+    private fun render(bubble: View, state: MotionState) {
+        bubble.findViewById<TextView>(R.id.bubble_icon).text = iconFor(state)
+        bubble.findViewById<TextView>(R.id.bubble_label).text = state.motionType.wire.replace('_', ' ')
+        bubble.alpha = 0.6f + 0.4f * state.intensity
     }
 
     private fun iconFor(state: MotionState): String = when (state.motionType) {

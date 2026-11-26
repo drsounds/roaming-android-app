@@ -1,5 +1,5 @@
 ---
-sidebar_position: 6
+sidebar_position: 7
 title: Privacy policy
 ---
 
@@ -40,7 +40,7 @@ Roaming turns your movement into input for other apps and games. To do this it u
 
 Roaming never reads your location (GPS) and does not store health data.
 
-Your chosen settings, such as the gamepad mapping, are stored locally on your device. You can remove them at any time by clearing the app's data or uninstalling it.
+Your chosen settings, such as the gamepad mapping, the reminder interval and whether you accepted the safety disclaimer, are stored locally on your device. You can remove them at any time by clearing the app's data or uninstalling it.
 
 ## 4. The motion broadcast
 

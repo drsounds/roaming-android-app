@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
@@ -22,6 +23,41 @@
             android:layout_marginTop="8dp"
             android:text="@string/tagline"
             android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+        <com.google.android.material.card.MaterialCardView
+            style="?attr/materialCardViewOutlinedStyle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:strokeColor="@color/bubble_warning">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="@string/safety_card_title"
+                    android:textAppearance="?attr/textAppearanceTitleMedium" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/safety_card_text"
+                    android:textAppearance="?attr/textAppearanceBodyMedium" />
+
+                <Button
+                    android:id="@+id/button_safety"
+                    style="?attr/borderlessButtonStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/safety_read_disclaimer" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <com.google.android.material.materialswitch.MaterialSwitch
             android:id="@+id/switch_steps"
@@ -62,6 +98,32 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/gamepad_hint"
+            android:textAppearance="?attr/textAppearanceBodySmall" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="@string/safety_reminder_interval"
+                android:textAppearance="?attr/textAppearanceBodyLarge" />
+
+            <Spinner
+                android:id="@+id/spinner_reminder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/safety_reminder_interval_hint"
             android:textAppearance="?attr/textAppearanceBodySmall" />
 
         <Button

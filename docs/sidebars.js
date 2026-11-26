@@ -17,6 +17,7 @@ const sidebars = {
       items: ['gamepad/overview', 'gamepad/mapping'],
     },
     'detection',
+    'safety',
     'privacy',
   ],
 };

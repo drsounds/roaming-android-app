@@ -14,6 +14,10 @@ Obesity is one of the largest public health challenges of our time. According to
 
 Roaming does the motion detection once, on the device, so any game can add physical activity with a few lines of code instead of building its own sensor or camera pipeline.
 
+## Safety first
+
+Roaming makes people move while they look at a screen. Only use it in a safe environment and keep track of your surroundings; the app asks players to accept a safety warning and reminds them regularly while tracking. Roaming is provided without any warranty and the user is responsible for all use. See [Safety and disclaimer](./safety.md).
+
 ## How it works
 
 1. The player opens Roaming, picks the inputs (step sensor, camera, or both) and taps **Start tracking**.
