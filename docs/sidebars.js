@@ -10,6 +10,12 @@ const sidebars = {
       collapsed: false,
       items: ['integrations/kotlin', 'integrations/java', 'integrations/unity', 'integrations/godot'],
     },
+    {
+      type: 'category',
+      label: 'Gamepad mode',
+      collapsed: false,
+      items: ['gamepad/overview', 'gamepad/mapping'],
+    },
     'detection',
     'privacy',
   ],
