@@ -13,8 +13,8 @@ Each state has the shape `{ motion_type, direction, intensity, vector }`.
 | --- | --- | --- |
 | `idle` | Not moving (or the body is not visible to the camera) | both |
 | `step` | A single step after standing still; becomes `walking` / `running` with the next steps | step sensor |
-| `walking` | Steady steps below the running cadence | both |
-| `running` | Fast steps: 140+ steps/min on the step sensor, 150+ knee lifts/min on camera | both |
+| `walking` | Steady steps below the running cadence. On camera, from knee lifts or, with only the upper body in view, from the rhythm of the arms, head and shoulders (elliptical, bike, stepper) | both |
+| `running` | Fast steps: 140+ steps/min on the step sensor, 150+ knee lifts or upper-body strides/min on camera | both |
 | `jumping` | A jump. On the step sensor, a strong upward acceleration; on camera, hips well above the standing height | both |
 | `squatting` | Hips well below the standing height | camera |
 | `leaning` | Leaning (camera) or tilting the phone (step sensor) left or right while not stepping | both |
@@ -40,7 +40,7 @@ While walking or running, tilting the phone (step sensor) or leaning (camera) ch
 
 A float from `0.0` to `1.0`:
 
-- `walking` / `running`: cadence divided by the maximum (200 steps/min for the step sensor, 220 for the camera)
+- `walking` / `running`: cadence divided by the maximum (200 steps/min for the step sensor, 220 for the camera). When the camera only sees the upper body, it's the larger of that and how vigorously the head and arms move, so pushing harder on an elliptical raises intensity even at the same pace
 - `jumping`, `squatting`, `leaning`, `arms_raised`: how far the body moved, relative to the player's torso length (camera) or the strength of the acceleration (step sensor)
 - `step`: always `0.3`
 - `idle`: `0.0`

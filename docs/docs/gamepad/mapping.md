@@ -34,6 +34,10 @@ Each [`motion_type`](../event-reference.md#motion_type) drives one gamepad contr
 
 Stick deflection is `0.3 + 0.7 × intensity`, so slow walking (intensity around 0.4) already pushes the stick about 60% and gets past the dead zone most games use, while sprinting pushes it all the way.
 
+### Elliptical and bike workouts
+
+With the camera input and only your upper body in view, an elliptical, exercise bike or stepper workout is reported as `walking` / `running` (see [How motion is detected](../detection.md#upper-body-only-elliptical-bike-selfie-mode)), so it drives the same controls as walking: by default, the left stick forward, pushed further the harder you work. For racing games, map **Walking** and **Running** to the right trigger.
+
 ### Short motions
 
 Every motion is held for at least 150 ms, so a single step or a quick jump always reaches the game as a full button press, even if the motion was over before the next report.

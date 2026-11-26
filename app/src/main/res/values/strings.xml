@@ -5,7 +5,7 @@
     <string name="input_steps">Step sensor</string>
     <string name="input_camera">Camera</string>
     <string name="input_steps_hint">Hardware step detector plus device tilt. Keep the phone in your hand or pocket.</string>
-    <string name="input_camera_hint">On-device pose detection with the front camera. Stand back so your body is in view. Frames never leave the device.</string>
+    <string name="input_camera_hint">On-device pose detection with the front camera. Stand back so your body is in view, or for an elliptical or bike, just your head, shoulders and arms. Frames never leave the device.</string>
     <string name="start">Start tracking</string>
     <string name="stop">Stop</string>
     <string name="status_idle">Not tracking</string>
