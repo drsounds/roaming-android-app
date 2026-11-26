@@ -5,15 +5,22 @@ An Android stepwatcher and motion sensing app which can send broadcasts about mo
 2. On device identification of body motion through on devicd model analyzes device cameram
 
 # Output
-A stream of Steps / motion detected as stream of events ````{
+A stream of Steps / motion detected as stream of events ````json
+{
 motion_type,
 direction,
 intensity
-}````
+}
+````
+
 which are sent as broadcast intents
+
 ````se.roaming.app.event.MOTION````
+
 with data
-````{
+
+````json
+{
 new: { motion_type,
 direction,
 intensity},
@@ -22,7 +29,8 @@ motion_type,
 direction,
 intensity
 }
-}````
+}
+````
 
 # Privacy
 
