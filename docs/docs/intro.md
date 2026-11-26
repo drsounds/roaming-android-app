@@ -19,6 +19,7 @@ Roaming does the motion detection once, on the device, so any game can add physi
 1. The player opens Roaming, picks the inputs (step sensor, camera, or both) and taps **Start tracking**.
 2. Roaming runs a foreground service with an ongoing notification. It turns sensor readings or camera frames into motion states such as `running` or `jumping`.
 3. Every change is sent as a broadcast. Your app registers a receiver and reacts.
+4. Optionally, Roaming also acts as a Bluetooth gamepad, so games on a computer, TV or tablet can be played with your body without any changes. See [Gamepad mode](./gamepad/overview.md).
 
 ```text
  step sensor / camera ──▶ Roaming classifier ──▶ broadcast se.spacify.app.roaming.event.MOTION ──▶ your game

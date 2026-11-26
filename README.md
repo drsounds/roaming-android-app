@@ -102,11 +102,17 @@ ContextCompat.registerReceiver(
 
 Unity, Godot and other engines can do the same through their Android plugin layer.
 
+# Gamepad mode
+
+Roaming can also act as a **Bluetooth gamepad** (Android 9+). A computer, Android TV, tablet or another phone pairs with the phone like any wireless controller, and your motion drives the sticks and buttons, so any game with gamepad support can be played with your body without changes. By default walking, running and leaning move the left stick (following the direction), jumping presses A, squatting B and raising your arms Y. Every motion type can be remapped in the app to a stick, the D-pad, an analog trigger or a button.
+
+It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browsers and Steam. Consoles (PlayStation, Xbox, Switch) only accept their own controllers, and games on the same phone can't receive it (Android doesn't let apps inject gamepad input into other apps), so they should use the broadcast. See the [gamepad docs](https://drsounds.github.io/roaming-android-app/gamepad/overview) for pairing, compatibility and the HID layout.
+
 # Using the app
 
 1. Install the debug APK from the latest CI run (or build it, see below).
 2. Choose the inputs: Step sensor, Camera, or both.
-3. Optionally allow the overlay bubble ("display over other apps").
+3. Optionally turn on **Act as a Bluetooth gamepad**, and allow the overlay bubble ("display over other apps").
 4. Tap **Start tracking**. Roaming shows an ongoing notification with a **Stop** action; broadcasts are only sent while it is there.
 5. Switch to your game.
 
@@ -129,13 +135,14 @@ Developer docs for the broadcast, with integration guides for Kotlin, Java, Unit
 Requirements: JDK 17 and the Android SDK (API 36).
 
 ```sh
-./gradlew testDebugUnitTest   # unit tests for the motion classifiers
+./gradlew testDebugUnitTest   # unit tests for the motion classifiers and gamepad mapping
 ./gradlew assembleDebug       # app/build/outputs/apk/debug/app-debug.apk
 ```
 
 Project layout:
 
 * `app/src/main/java/se/spacify/app/roaming/motion`: event model, classifiers (pure Kotlin, unit tested), sensor and camera sources, broadcaster
+* `app/src/main/java/se/spacify/app/roaming/gamepad`: motion-to-gamepad mapping and HID report (pure Kotlin, unit tested) and the Bluetooth HID gamepad
 * `.../service/MotionService.kt`: the foreground service
 * `.../overlay/OverlayBubble.kt`: the on-screen bubble
 * `.../ui/MainActivity.kt`: start/stop screen and live event view
