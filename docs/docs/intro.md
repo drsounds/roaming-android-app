@@ -22,7 +22,7 @@ Roaming makes people move while they look at a screen. Only use it in a safe env
 
 1. The player opens Roaming, picks the inputs (step sensor, camera, or both) and taps **Start tracking**.
 2. Roaming runs a foreground service with an ongoing notification. It turns sensor readings or camera frames into motion states such as `running` or `jumping`.
-3. Every change is sent as a broadcast. Your app registers a receiver and reacts.
+3. Every change is sent as a broadcast, and to any app bound to Roaming's motion service. Your app registers a receiver, or binds for the [lowest latency](./low-latency.md), and reacts.
 4. Optionally, Roaming also acts as a Bluetooth gamepad, so games on a computer, TV or tablet can be played with your body without any changes. See [Gamepad mode](./gamepad/overview.md).
 
 ```text
@@ -32,5 +32,6 @@ Roaming makes people move while they look at a screen. Only use it in a safe env
 ## Next steps
 
 - [The broadcast](./broadcast.md): what is sent and when
+- [Low-latency connection](./low-latency.md): get each event as a direct callback
 - [Event reference](./event-reference.md): every field and value
 - Integrations: [Kotlin](./integrations/kotlin.md), [Java](./integrations/java.md), [Unity](./integrations/unity.md), [Godot](./integrations/godot.md)

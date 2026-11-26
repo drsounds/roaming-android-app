@@ -3,6 +3,7 @@ const sidebars = {
   docs: [
     'intro',
     'broadcast',
+    'low-latency',
     'event-reference',
     {
       type: 'category',

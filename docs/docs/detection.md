@@ -7,13 +7,15 @@ title: How motion is detected
 
 ## Step sensor
 
-Uses the phone's hardware step detector, gravity sensor and linear acceleration sensor. The phone can be held in the hand or kept in a pocket.
+Uses the phone's gravity sensor, linear acceleration sensor and hardware step detector. The phone can be held in the hand or kept in a pocket.
 
-- **Steps and cadence**: steps over the last 4 seconds give steps per minute. Below 140 is `walking`, 140 and above is `running`.
+- **Steps**: each bounce of the phone's vertical acceleration (above 1.2 m/s², at most 4 per second) is a step, reported as soon as it happens. The first step gives `step`, the second `walking`. Many phones' hardware step detectors only start reporting after several steps and then deliver them late, so the hardware detector is only used when the bounce isn't clear enough to count, for example with the phone held very loosely.
+- **Cadence**: steps over the last 4 seconds give steps per minute. Below 140 is `walking`, 140 and above is `running`.
+- **Stopping**: after two missed steps at your current pace (between 0.7 and 2 seconds), Roaming reports `idle`.
 - **Steering**: tilting the top of the phone to the left or right (held upright) sets the direction to `left` / `right`. Standing still while tilting gives `leaning`.
 - **Jumps**: upward acceleration (relative to gravity) above 6 m/s² is a jump.
 
-Requires the **Physical activity** permission and a phone with a step detector.
+Requires the **Physical activity** permission. A phone without a hardware step detector still works with the acceleration-based steps.
 
 ## Camera
 

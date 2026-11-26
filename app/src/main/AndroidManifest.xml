@@ -47,5 +47,16 @@
             android:name=".service.MotionService"
             android:exported="false"
             android:foregroundServiceType="health|camera|connectedDevice" />
+
+        <!-- Low-latency channel: other apps bind here to get each motion event as a direct
+             callback. Like the broadcast it needs no permission, and binding never starts tracking. -->
+        <service
+            android:name=".service.MotionLinkService"
+            android:exported="true"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="se.spacify.app.roaming.action.BIND_MOTION" />
+            </intent-filter>
+        </service>
     </application>
 </manifest>

@@ -23,7 +23,7 @@ Roaming does not stream at sensor rate. An event is sent when:
 
 So you can treat each event as "something happened". The `prev` state tells you what the player was doing before.
 
-When the step sensor sees no steps for 2 seconds, it sends an event back to `idle`. When the camera loses the player's body, it sends `idle` too.
+When the step sensor stops seeing steps, it sends an event back to `idle`: after two missed steps at your current pace (between 0.7 and 2 seconds), or after 2 seconds following a single step. When the camera loses the player's body, it sends `idle` too.
 
 ## Payload
 
@@ -52,7 +52,8 @@ The same values are also available as flat extras, so you don't have to parse JS
 | `prev_motion_type` | String | `walking` |
 | `prev_direction` | String | `forward` |
 | `prev_intensity` | float | `0.55` |
-| `timestamp` | long | `SystemClock.elapsedRealtime()` in ms when the event was created |
+| `timestamp` | long | `SystemClock.elapsedRealtime()` in ms when the motion was detected |
+| `sent_at` | long | `SystemClock.elapsedRealtime()` in ms when Roaming sent the event |
 | `source` | String | `step_sensor` or `camera` |
 
 When both inputs are on, each one sends its own events. Use `source` to tell them apart, or to prefer one.
@@ -62,3 +63,9 @@ When both inputs are on, each one sends its own events. Use `source` to tell the
 Since Android 8 (API 26), implicit broadcasts are **not** delivered to receivers declared in `AndroidManifest.xml`. Register the receiver in code while your game is in the foreground, and unregister it when it isn't. On Android 13 and later, a receiver for another app's broadcast must be registered as **exported**. `ContextCompat.registerReceiver(..., RECEIVER_EXPORTED)` handles that on all versions.
 
 See [Kotlin](./integrations/kotlin.md) or [Java](./integrations/java.md) for full code.
+
+## Latency
+
+Roaming sends the broadcast on the system's foreground broadcast queue, so it normally arrives within a few milliseconds. When the phone is busy it can still be held up. If your game needs every event as fast as possible, use the [low-latency connection](./low-latency.md) instead: a bound service that calls your app directly. It sends the same extras.
+
+`timestamp` and `sent_at` use `SystemClock.elapsedRealtime()`, which is the same clock in every app, so `SystemClock.elapsedRealtime() - intent.getLongExtra("sent_at", 0)` in your receiver is the delivery delay.

@@ -50,4 +50,28 @@ class StepCadenceClassifierTest {
         assertEquals(MotionType.JUMPING, c.classify(1_100L).motionType)
         assertEquals(Direction.UP, c.classify(1_100L).direction)
     }
+
+    @Test
+    fun stoppingIsReportedAfterTwoMissedSteps() {
+        val c = StepCadenceClassifier()
+        for (i in 0..6) c.onStep(i * 500L) // last step at 3000, 500 ms apart
+        assertEquals(MotionType.WALKING, c.classify(3_900L).motionType)
+        assertEquals(MotionState.IDLE, c.classify(4_100L))
+    }
+
+    @Test
+    fun aSingleStepWaitsLongerBeforeIdle() {
+        val c = StepCadenceClassifier()
+        c.onStep(0L)
+        assertEquals(MotionType.STEP, c.classify(1_500L).motionType)
+        assertEquals(MotionState.IDLE, c.classify(2_100L))
+    }
+
+    @Test
+    fun verticalAccelerationFollowsGravity() {
+        val c = StepCadenceClassifier()
+        c.onGravity(0f, 0f, 9.81f) // phone flat on its back
+        assertEquals(2f, c.verticalAcceleration(0f, 0f, 2f)!!, 0.001f)
+        assertEquals(0f, c.verticalAcceleration(2f, 0f, 0f)!!, 0.001f)
+    }
 }
