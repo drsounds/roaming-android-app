@@ -43,11 +43,14 @@ Stopping tracking (in the app or with **Stop** in the notification) releases all
 | Steam on any OS | Yes | Steam Input can remap it like any generic controller. |
 | macOS, iOS, iPadOS | Partly | Apps built on SDL, Steam or the browser see it. Apps that use Apple's Game Controller framework (for example Apple Arcade) only accept the controllers Apple supports. |
 | PlayStation, Xbox, Nintendo Switch | No | Consoles only accept their own (or licensed) controllers. |
-| Games on the same phone | No | See below. |
+| Games on the same phone | With Shizuku | Not over Bluetooth, but the separate [gamepad for apps on this phone](./this-phone.md) works with the free Shizuku app or root. |
 
-### Why not games on the same phone?
+### Games on the same phone
 
-Android doesn't let an app inject gamepad input into other apps (that needs root or system privileges), and a phone can't pair with itself over Bluetooth. Games on the phone itself should listen to the [broadcast](../broadcast.md) instead; see the [integration guides](../integrations/kotlin.md).
+A phone can't pair with itself over Bluetooth, and Android doesn't let a normal app send gamepad input to other apps. There are two ways around it:
+
+- Turn on [**Act as a gamepad for apps on this phone**](./this-phone.md). With the free Shizuku app (or root), Roaming adds a virtual gamepad that any game on the phone can use, with the same mapping.
+- Games that integrate Roaming listen to the [broadcast](../broadcast.md) instead; see the [integration guides](../integrations/kotlin.md).
 
 ## Battery and privacy
 

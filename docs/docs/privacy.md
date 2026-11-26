@@ -10,6 +10,7 @@ title: Privacy
 - **No health data stored.** Only a few seconds of step timestamps stay in memory. Camera frames are never saved.
 - **Always visible.** Broadcasts are only sent while the foreground service runs. Its notification is always shown and has a **Stop** button.
 - **Gamepad mode is opt in.** When you turn it on, Roaming sends gamepad reports (button, stick and trigger values) over Bluetooth to the one device you paired. No camera frames, sensor data or anything else are sent.
+- **The phone gamepad is opt in too.** It needs Shizuku (or root), which you install and start yourself. Roaming uses it for one thing only: a small helper process that creates the virtual gamepad and passes it button and stick values. It runs only while tracking with the phone gamepad on, and stops with it.
 - **Open source** under the Apache License 2.0.
 
 Note that the broadcast itself can be received by any installed app while tracking is on. It only contains the current motion state, not raw sensor data or images.

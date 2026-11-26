@@ -14,7 +14,7 @@ const sidebars = {
       type: 'category',
       label: 'Gamepad mode',
       collapsed: false,
-      items: ['gamepad/overview', 'gamepad/mapping'],
+      items: ['gamepad/overview', 'gamepad/this-phone', 'gamepad/mapping'],
     },
     'detection',
     'privacy',

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 3
 title: Mapping and HID layout
 ---
 
@@ -51,6 +51,8 @@ When both inputs are on, the gamepad shows both: buttons from either input are p
 For developers writing their own mapping (Steam Input, SDL `gamecontrollerdb`, a game's input settings), the gamepad reports this layout. It follows the Linux / Android gamepad convention, so those hosts need no mapping at all.
 
 **Bluetooth:** HID device, subclass *gamepad*, service name `Roaming Gamepad`. The host sees the phone's own Bluetooth name.
+
+**On this phone:** a `uhid` device named `Roaming Gamepad` on the USB bus, vendor and product ID `0000`, with the same descriptor and reports. See [Gamepad for apps on this phone](./this-phone.md).
 
 ### Buttons
 

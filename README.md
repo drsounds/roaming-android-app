@@ -106,7 +106,9 @@ Unity, Godot and other engines can do the same through their Android plugin laye
 
 Roaming can also act as a **Bluetooth gamepad** (Android 9+). A computer, Android TV, tablet or another phone pairs with the phone like any wireless controller, and your motion drives the sticks and buttons, so any game with gamepad support can be played with your body without changes. By default walking, running and leaning move the left stick (following the direction), jumping presses A, squatting B and raising your arms Y. Every motion type can be remapped in the app to a stick, the D-pad, an analog trigger or a button.
 
-It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browsers and Steam. Consoles (PlayStation, Xbox, Switch) only accept their own controllers, and games on the same phone can't receive it (Android doesn't let apps inject gamepad input into other apps), so they should use the broadcast. See the [gamepad docs](https://drsounds.github.io/roaming-android-app/gamepad/overview) for pairing, compatibility and the HID layout.
+It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browsers and Steam. Consoles (PlayStation, Xbox, Switch) only accept their own controllers. See the [gamepad docs](https://drsounds.github.io/roaming-android-app/gamepad/overview) for pairing, compatibility and the HID layout.
+
+**Games on the same phone:** a phone can't pair with itself, and Android doesn't let normal apps send gamepad input to other apps. With the free [Shizuku](https://shizuku.rikka.app) app (or root), turn on **Act as a gamepad for apps on this phone**: Roaming then creates a virtual gamepad through the kernel's `uhid` interface, which every game on the phone sees like a plugged-in controller. See [Gamepad for apps on this phone](https://drsounds.github.io/roaming-android-app/gamepad/this-phone).
 
 # Using the app
 
@@ -142,7 +144,7 @@ Requirements: JDK 17 and the Android SDK (API 36).
 Project layout:
 
 * `app/src/main/java/se/spacify/app/roaming/motion`: event model, classifiers (pure Kotlin, unit tested), sensor and camera sources, broadcaster
-* `app/src/main/java/se/spacify/app/roaming/gamepad`: motion-to-gamepad mapping and HID report (pure Kotlin, unit tested) and the Bluetooth HID gamepad
+* `app/src/main/java/se/spacify/app/roaming/gamepad`: motion-to-gamepad mapping and HID report (pure Kotlin, unit tested) and the Bluetooth HID gamepad; `gamepad/local` holds the Shizuku-run `uhid` gamepad for apps on this phone
 * `.../service/MotionService.kt`: the foreground service
 * `.../overlay/OverlayBubble.kt`: the on-screen bubble
 * `.../ui/MainActivity.kt`: start/stop screen and live event view
