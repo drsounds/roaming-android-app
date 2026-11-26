@@ -34,7 +34,8 @@ class UhidGamepadService : IUhidGamepad.Stub() {
             }
             null
         } catch (e: ErrnoException) {
-            "${e.functionName ?: "open"} $DEVICE failed: ${OsConstants.errnoName(e.errno) ?: e.errno}"
+            // For example "open failed: EACCES (Permission denied)".
+            "$DEVICE: ${e.message}"
         } catch (e: Exception) {
             e.toString()
         }
