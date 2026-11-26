@@ -26,6 +26,7 @@ All distances are measured relative to the player's torso length, so the player 
 - **Jump / squat**: hip height compared with a slowly adapting standing baseline.
 - **Lean**: horizontal offset between shoulders and hips.
 - **Arms raised**: both wrists above the nose.
+- **Raising (arm gestures)**: held for 0.25 s. One wrist more than 0.1 torso lengths above the nose is `up`; one wrist at least 0.8 torso lengths out from its own shoulder, on the outside and within 0.45 torso lengths of shoulder height, is `left` / `right` (which arm it is, so it is the player's own side whatever the camera mirroring); both wrists more than 0.5 torso lengths below the hips is `down`.
 - **Walking / running in place**: alternating knee lifts, counted like steps.
 
 Prop the phone up so the player is visible at least from the head to the hips (to the knees for running in place).
@@ -38,6 +39,7 @@ When only the head and shoulders are in view, for example with the phone on the 
 - **Rhythm**: steps are counted from whichever signal swings most clearly: the arms moving in opposite directions (one step per swing), the elbows, the head swaying side to side, or the whole upper body bobbing (one bob per step). The cadence gives `walking`, or `running` at 150 steps/min and above.
 - **Both are needed**: a rhythm of at least 3 steps within 3 seconds, and movement above the noise floor. Talking with your hands or shifting in your seat stays `idle`.
 - **Arms raised**: both wrists above the nose is still `arms_raised`.
+- **Raising**: one arm up or one arm stretched out to a side works the same as with the whole body (measured in shoulder widths, a torso counted as 1.5 of them). `down` needs the hips, so it is only available with the whole body in view.
 
 On an exercise bike the upper body moves much less than on an elliptical, so keep your arms in view or rock with the pedalling, otherwise it may stay `idle`.
 

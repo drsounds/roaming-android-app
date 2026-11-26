@@ -18,13 +18,14 @@ Each [`motion_type`](../event-reference.md#motion_type) drives one gamepad contr
 | Jumping | A | jump |
 | Squatting | B | crouch / dodge |
 | Arms raised | Y | action / interact |
+| Raising (arm up / down / left / right) | D-pad (follows direction) | menus, or any four-way choice |
 | Idle | nothing | |
 
 ## Controls you can choose
 
 | Control | What it does |
 | --- | --- |
-| **Left stick / Right stick** | Follows the motion's direction. `forward` pushes the stick up, `backward` down, `left` / `right` sideways. Walking or running while steering left or right pushes it diagonally forward, so you keep moving while you turn. A jump (`up`) counts as forward and a squat (`down`) as back. |
+| **Left stick / Right stick** | Follows the motion's direction. `forward` pushes the stick up, `backward` down, `left` / `right` sideways. Walking or running while steering left or right pushes it diagonally forward, so you keep moving while you turn. A jump or an arm raised up (`up`) counts as forward, and a squat or hands down (`down`) as back. |
 | **D-pad** | Like a stick, but snapped to the 8 D-pad directions and always fully pressed. |
 | **Left trigger / Right trigger** | Analog, pressed as far as the motion's intensity (0 to 1). Good for racing games: map running to the right trigger to accelerate. |
 | **A, B, X, Y, L1, R1, L3, R3, Select, Start** | Held down while the motion lasts. |

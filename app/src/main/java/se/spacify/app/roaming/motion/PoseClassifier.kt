@@ -32,6 +32,8 @@ data class BodyPose(
  * All distances are normalised by torso length so the user can stand at any distance.
  * A slowly adapting baseline of hip height lets us tell jumps (hips above baseline) from
  * squats (hips below). Alternating knee lifts count as steps in place, giving WALKING/RUNNING.
+ * Held arm gestures (one arm up, one arm out to a side, both hands down) give RAISING, see
+ * [ArmRaiseDetector].
  */
 class PoseClassifier(
     private val jumpThreshold: Float = 0.30f,
@@ -48,6 +50,7 @@ class PoseClassifier(
     private var baselineHipY: Float? = null
     private var lastKneeSign = 0
     private val steps = ArrayDeque<Long>()
+    private val raise = ArmRaiseDetector()
 
     /** Returns the classified state and whether a discrete step was detected on this frame. */
     fun classify(pose: BodyPose, nowMillis: Long): Pair<MotionState, Boolean> {
@@ -58,6 +61,10 @@ class PoseClassifier(
         val rise = (baseline - hipY) / torso // >0 when hips are above baseline
 
         val stepped = trackKnees(pose, torso, nowMillis)
+        val raising = raise.update(
+            pose.nose, pose.leftShoulder, pose.rightShoulder, pose.leftWrist, pose.rightWrist,
+            pose.hipCenter.y, torso, nowMillis,
+        )
 
         val state = when {
             rise > jumpThreshold -> MotionState.of(MotionType.JUMPING, Direction.UP, rise)
@@ -67,6 +74,7 @@ class PoseClassifier(
                     MotionType.ARMS_RAISED, Direction.UP,
                     ((pose.nose.y - minOf(pose.leftWrist.y, pose.rightWrist.y)) / torso)
                 )
+            raising != null -> raising
             else -> {
                 val lean = (pose.shoulderCenter.x - pose.hipCenter.x) / torso
                 val cadence = cadence(nowMillis)
@@ -92,6 +100,7 @@ class PoseClassifier(
         baselineHipY = null
         lastKneeSign = 0
         steps.clear()
+        raise.reset()
     }
 
     private fun leanDirection(lean: Float): Direction {

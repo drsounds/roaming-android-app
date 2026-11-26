@@ -11,7 +11,10 @@ enum class MotionType(val wire: String) {
     JUMPING("jumping"),
     SQUATTING("squatting"),
     LEANING("leaning"),
-    ARMS_RAISED("arms_raised");
+    ARMS_RAISED("arms_raised"),
+
+    /** Camera gesture: one arm up, one arm out to the left / right, or both hands down. */
+    RAISING("raising");
 
     companion object {
         fun fromWire(value: String?): MotionType = entries.firstOrNull { it.wire == value } ?: IDLE

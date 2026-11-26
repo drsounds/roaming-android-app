@@ -350,6 +350,7 @@ class MainActivity : AppCompatActivity() {
         MotionType.SQUATTING -> R.string.motion_squatting
         MotionType.LEANING -> R.string.motion_leaning
         MotionType.ARMS_RAISED -> R.string.motion_arms_raised
+        MotionType.RAISING -> R.string.motion_raising
     }
 
     @StringRes

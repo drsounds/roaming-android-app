@@ -86,6 +86,7 @@ data class GamepadMapping(
                 MotionType.JUMPING to GamepadControl.A,
                 MotionType.SQUATTING to GamepadControl.B,
                 MotionType.ARMS_RAISED to GamepadControl.Y,
+                MotionType.RAISING to GamepadControl.DPAD,
             )
         )
 

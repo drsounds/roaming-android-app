@@ -47,7 +47,7 @@ When active, Roaming also shows an overlay on the screen: a small draggable bubb
 
 | Field | Values |
 | --- | --- |
-| `motion_type` | `idle`, `step`, `walking`, `running`, `jumping`, `squatting`, `leaning`, `arms_raised` |
+| `motion_type` | `idle`, `step`, `walking`, `running`, `jumping`, `squatting`, `leaning`, `arms_raised`, `raising` |
 | `direction` | `none`, `forward`, `backward`, `left`, `right`, `up`, `down` (from the user's point of view) |
 | `intensity` | `0.0` to `1.0` |
 | `vector` | `{ x, y, z }`: the direction scaled by intensity, so it can be used like an accelerometer or joystick (x = right, y = up, z = forward) |
@@ -72,7 +72,20 @@ An event is sent when the motion type or direction changes, when the intensity c
 | Input | What it detects |
 | --- | --- |
 | Step sensor | `step`, `walking` / `running` (from cadence), `jumping` (vertical acceleration spike), and `left` / `right` from tilting the phone, which also gives `leaning` when standing still |
-| Camera | `jumping` and `squatting` (hip height against a baseline), `leaning` left/right, `arms_raised`, and `walking` / `running` in place (alternating knee lifts). With only the head and shoulders in view (selfie mode, or a phone on an elliptical or bike console) it reports `walking` / `running` from the rhythm and intensity of upper-body movement |
+| Camera | `jumping` and `squatting` (hip height against a baseline), `leaning` left/right, `arms_raised`, the `raising` gestures (see below), and `walking` / `running` in place (alternating knee lifts). With only the head and shoulders in view (selfie mode, or a phone on an elliptical or bike console) it reports `walking` / `running` from the rhythm and intensity of upper-body movement |
+
+## Camera gestures: raising up, down, left and right
+
+In camera mode, four held arm signals are sent as `motion_type` = `raising` with a `direction`, so a game can use them for things other than walking (raise or lower something, turn it, sway):
+
+| Gesture | `direction` | How |
+| --- | --- | --- |
+| Raise up | `up` | One arm straight up, wrist above the head (both arms up stays `arms_raised`) |
+| Raise down | `down` | Both hands reaching down, wrists well below the hips (needs the hips in view) |
+| Raise left | `left` | Your left arm stretched out to your left side, about shoulder height |
+| Raise right | `right` | Your right arm stretched out to your right side, about shoulder height |
+
+The pose must be held for 0.25 s before it is sent, so arm swings while walking or running in place don't trigger it. `intensity` is how far the arm reaches, and the flat extras are the same as for every other event (`motion_type=raising`, `direction=left`, `intensity`, `vector_x`...). In gamepad mode, `raising` drives the D-pad by default.
 
 ## Listening from your game
 
@@ -92,6 +105,7 @@ class MotionReceiver(private val onMotion: (type: String, direction: String, int
 
 val receiver = MotionReceiver { type, direction, intensity ->
     if (type == "jumping") player.jump(intensity)
+    if (type == "raising" && direction == "up") player.raiseArm()
     player.speed = if (type == "running" || type == "walking") intensity else 0f
 }
 ContextCompat.registerReceiver(
@@ -106,7 +120,7 @@ Unity, Godot and other engines can do the same through their Android plugin laye
 
 # Gamepad mode
 
-Roaming can also act as a **Bluetooth gamepad** (Android 9+). A computer, Android TV, tablet or another phone pairs with the phone like any wireless controller, and your motion drives the sticks and buttons, so any game with gamepad support can be played with your body without changes. By default walking, running and leaning move the left stick (following the direction), jumping presses A, squatting B and raising your arms Y. Every motion type can be remapped in the app to a stick, the D-pad, an analog trigger or a button.
+Roaming can also act as a **Bluetooth gamepad** (Android 9+). A computer, Android TV, tablet or another phone pairs with the phone like any wireless controller, and your motion drives the sticks and buttons, so any game with gamepad support can be played with your body without changes. By default walking, running and leaning move the left stick (following the direction), jumping presses A, squatting B, raising both arms Y, and the `raising` arm gestures (up, down, left, right) the D-pad. Every motion type can be remapped in the app to a stick, the D-pad, an analog trigger or a button.
 
 It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browsers and Steam. Consoles (PlayStation, Xbox, Switch) only accept their own controllers, and games on the same phone can't receive it (Android doesn't let apps inject gamepad input into other apps), so they should use the broadcast. See the [gamepad docs](https://drsounds.github.io/roaming-android-app/gamepad/overview) for pairing, compatibility and the HID layout.
 

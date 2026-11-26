@@ -96,6 +96,12 @@ class OverlayBubble(private val context: Context) {
         MotionType.JUMPING -> "⬆" // ⬆
         MotionType.SQUATTING -> "⬇" // ⬇
         MotionType.ARMS_RAISED -> "🙌" // 🙌
+        MotionType.RAISING -> when (state.direction) {
+            Direction.UP -> "☝" // ☝
+            Direction.DOWN -> "👇" // 👇
+            Direction.LEFT -> "👈" // 👈
+            else -> "👉" // 👉
+        }
         MotionType.LEANING -> if (state.direction == Direction.LEFT) "⬅" else "➡" // ⬅ ➡
     }
 
