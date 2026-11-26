@@ -12,12 +12,12 @@ plugins {
 
 android {
     namespace = "se.spacify.app.roaming"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "se.spacify.app.roaming"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 36
         // GITHUB_RUN_NUMBER strictly increases on every Actions run, so a CI-built AAB always
         // carries a versionCode Google Play hasn't seen before, with no manual bumping. When the
         // build runs via android-play-release.yml, the reusable build workflow sees the release
