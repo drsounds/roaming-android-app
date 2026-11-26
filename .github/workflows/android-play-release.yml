@@ -1,0 +1,56 @@
+name: Android Play Store Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: "Play Store track to publish to"
+        required: true
+        default: "internal"
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      releaseNotes:
+        description: "Optional release notes for this build (shown on the Play Store track)"
+        required: false
+        default: ""
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build
+    uses: ./.github/workflows/android-build.yml
+    secrets: inherit
+
+  publish:
+    name: Publish to Google Play
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download AAB build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: release-aab
+          path: release
+
+      - name: Prepare release notes
+        if: ${{ github.event.inputs.releaseNotes != '' }}
+        run: |
+          mkdir -p "${{ runner.temp }}/whatsnew"
+          printf '%s' "${{ github.event.inputs.releaseNotes }}" > "${{ runner.temp }}/whatsnew/whatsnew-en-US"
+
+      - name: Publish to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: se.spacify.app.roaming
+          releaseFiles: release/app-release.aab
+          track: ${{ github.event.inputs.track }}
+          status: completed
+          whatsNewDirectory: ${{ github.event.inputs.releaseNotes != '' && format('{0}/whatsnew', runner.temp) || '' }}

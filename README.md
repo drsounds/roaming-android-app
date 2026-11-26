@@ -141,4 +141,30 @@ Project layout:
 Apache License 2.0, see [LICENSE](LICENSE).
 
 # CI
-A GitHub Actions workflow (`.github/workflows/android.yml`) runs the unit tests and builds the debug APK on every push and pull request, and uploads the APK as a build artifact.
+Three GitHub Actions workflows live in `.github/workflows`:
+
+- **`android-ci.yml`** runs automatically on every push and pull request: it runs the unit tests, builds the debug APK and uploads it as the `roaming-debug-apk` artifact.
+- **`android-build.yml`** (manual, or called by the release workflow) builds and signs the release AAB and uploads it as the `release-aab` artifact (kept 14 days).
+- **`android-play-release.yml`** (manual) calls `android-build.yml` as its `build` job, then a separate `publish` job uploads that AAB to a Google Play track (defaults to **internal**). Because build and publish are separate jobs, "Re-run failed jobs" re-runs only `publish` and reuses the AAB already built.
+
+The release builds are started from the **Actions** tab via "Run workflow". `versionCode` comes from `GITHUB_RUN_NUMBER`, so every CI-built AAB has a code Google Play hasn't seen before.
+
+**Signing model**: Google Play manages the app signing key ([Play App Signing](https://support.google.com/googleplay/android-developer/answer/9842756)). CI only needs an **upload key**, a keystore used to sign the bundle you hand to Google, which Google then re-signs. Treat it as a long-lived credential.
+
+Configure these repository secrets before running the release workflows:
+
+| Secret | Description |
+| --- | --- |
+| `ANDROID_KEYSTORE_BASE64` | The upload keystore file, base64-encoded (`base64 -w0 upload-keystore.jks`). |
+| `ANDROID_KEYSTORE_PASSWORD` | Store password for the keystore. |
+| `ANDROID_KEY_ALIAS` | Alias of the upload key inside the keystore. |
+| `ANDROID_KEY_PASSWORD` | Password for the key itself (same as the store password for a PKCS12 keystore). |
+| `PLAY_SERVICE_ACCOUNT_JSON` | JSON key of a Google Play service account with "Release Manager" access to this app, pasted as plain text. |
+
+The service account must be linked in Google Play Console under **Setup → API access**, with permission to manage releases on the `se.spacify.app.roaming` package.
+
+For local release builds, put `RELEASE_STORE_FILE`, `RELEASE_STORE_PASSWORD`, `RELEASE_KEY_ALIAS` and `RELEASE_KEY_PASSWORD` in `local.properties` (not committed).
+
+**One-time setup before the first `android-play-release.yml` run:**
+1. The Play Developer API cannot create an app's very first release. Run `android-build.yml`, download the `release-aab` artifact, and upload it manually via **Play Console → Release → Internal testing → Create release** to create the app listing and enroll it in Play App Signing.
+2. After that first manual release exists, later releases can go through `android-play-release.yml`.
