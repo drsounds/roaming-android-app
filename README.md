@@ -112,6 +112,10 @@ Unity, Godot and other engines can do the same through their Android plugin laye
 
 For the camera, prop the phone up so your whole body (at least head to hips, ideally to the knees) is in view of the front camera.
 
+# Documentation
+
+Developer docs for the broadcast, with integration guides for Kotlin, Java, Unity and Godot, are published at **https://drsounds.github.io/roaming-android-app/**. The source is a [Docusaurus](https://docusaurus.io) site in [`docs/`](docs); run `npm ci && npm start` there to preview it. The `Docs (GitHub Pages)` workflow deploys it on every push to `main` that touches `docs/`.
+
 # Privacy
 
 * Only local. The app has no network permission (it is explicitly removed from the merged manifest).
