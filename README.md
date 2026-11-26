@@ -40,11 +40,11 @@ intensity
 * No GPS coordinate
 * No health data
 * Open Source
+* Use a foregroundservice with ongoing notificatoon so it only broadcasts when a pendingintent is live so the user always know it is tracking
 
 # License
 
 Apache license
-
 
 
 
