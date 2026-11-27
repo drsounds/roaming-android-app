@@ -4,5 +4,6 @@
     <color name="roaming_green_dark">#FF0F5C3B</color>
     <color name="bubble_background">#E61B8A5A</color>
     <color name="bubble_warning">#F2B3261E</color>
+    <color name="trash_background">#CC202020</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

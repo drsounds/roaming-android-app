@@ -48,6 +48,11 @@
             android:exported="false"
             android:foregroundServiceType="health|camera|connectedDevice" />
 
+        <!-- Stop action of the tracking notification. -->
+        <receiver
+            android:name=".service.StopTrackingReceiver"
+            android:exported="false" />
+
         <!-- Low-latency channel: other apps bind here to get each motion event as a direct
              callback. Like the broadcast it needs no permission, and binding never starts tracking. -->
         <service

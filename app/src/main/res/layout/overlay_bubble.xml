@@ -1,28 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- The motion bubble with the surroundings reminder in its own box underneath. Tapping opens
+     Roaming; dragging moves the whole overlay and shows the bin for stopping. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:background="@drawable/bubble_background"
-    android:gravity="center_vertical"
-    android:orientation="horizontal"
-    android:paddingStart="14dp"
-    android:paddingTop="8dp"
-    android:paddingEnd="16dp"
-    android:paddingBottom="8dp">
+    android:contentDescription="@string/overlay_bubble_description"
+    android:gravity="start"
+    android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/bubble_icon"
+    <LinearLayout
+        android:id="@+id/bubble"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/white"
-        android:textSize="22sp" />
+        android:background="@drawable/bubble_background"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingStart="14dp"
+        android:paddingTop="8dp"
+        android:paddingEnd="16dp"
+        android:paddingBottom="8dp">
+
+        <TextView
+            android:id="@+id/bubble_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="22sp" />
+
+        <TextView
+            android:id="@+id/bubble_label"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:textColor="@color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
 
     <TextView
-        android:id="@+id/bubble_label"
+        android:id="@+id/bubble_warning"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
+        android:layout_marginTop="6dp"
+        android:background="@drawable/bubble_background_warning"
+        android:paddingStart="12dp"
+        android:paddingTop="6dp"
+        android:paddingEnd="14dp"
+        android:paddingBottom="6dp"
+        android:text="@string/safety_reminder_box"
         android:textColor="@color/white"
-        android:textSize="14sp"
-        android:textStyle="bold" />
+        android:textSize="13sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
 </LinearLayout>

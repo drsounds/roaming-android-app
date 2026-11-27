@@ -22,7 +22,9 @@ import com.google.mlkit.vision.pose.Pose
 import com.google.mlkit.vision.pose.PoseDetection
 import com.google.mlkit.vision.pose.PoseLandmark
 import com.google.mlkit.vision.pose.defaults.PoseDetectorOptions
+import java.util.concurrent.Executor
 import java.util.concurrent.ExecutorService
+import java.util.concurrent.RejectedExecutionException
 import java.util.concurrent.Executors
 
 /**
@@ -57,7 +59,25 @@ class CameraPoseSource(
             .build()
     )
     private val executor: ExecutorService = Executors.newSingleThreadExecutor()
+
+    /**
+     * Runs work on [executor], and drops it once tracking has stopped. ML Kit finishes frames that
+     * were in flight when [stop] ran; handing their callbacks to the shut-down executor threw a
+     * [RejectedExecutionException] on ML Kit's thread and crashed the app.
+     */
+    private val safeExecutor = Executor { task ->
+        if (stopped) return@Executor
+        try {
+            executor.execute(task)
+        } catch (e: RejectedExecutionException) {
+            // Stopped meanwhile: nothing left to do with this frame.
+        }
+    }
+
+    @Volatile
+    private var stopped = false
     private var cameraProvider: ProcessCameraProvider? = null
+    private var analysis: ImageAnalysis? = null
 
     fun start() {
         // Without a gyroscope we assume the phone is mounted (steadiness stays 1).
@@ -66,7 +86,12 @@ class CameraPoseSource(
         }
         val future = ProcessCameraProvider.getInstance(context)
         future.addListener({
-            val provider = future.get()
+            // Tracking may already have stopped (the service is gone): don't open the camera.
+            if (stopped) return@addListener
+            val provider = runCatching { future.get() }.getOrElse { e ->
+                Log.e(TAG, "Could not get the camera", e)
+                return@addListener
+            }
             cameraProvider = provider
             val analysis = ImageAnalysis.Builder()
                 .setResolutionSelector(
@@ -78,7 +103,8 @@ class CameraPoseSource(
                 )
                 .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
                 .build()
-            analysis.setAnalyzer(executor, ::analyze)
+            analysis.setAnalyzer(safeExecutor, ::analyze)
+            this.analysis = analysis
             try {
                 provider.unbindAll()
                 provider.bindToLifecycle(lifecycleOwner, CameraSelector.DEFAULT_FRONT_CAMERA, analysis)
@@ -89,30 +115,42 @@ class CameraPoseSource(
     }
 
     fun stop() {
+        if (stopped) return
+        stopped = true
         sensorManager.unregisterListener(gyroListener)
-        cameraProvider?.unbindAll()
+        analysis?.clearAnalyzer()
+        analysis = null
+        runCatching { cameraProvider?.unbindAll() }
         cameraProvider = null
+        executor.shutdown()
+        runCatching { detector.close() }
         classifier.reset()
         upperBody.reset()
         steadiness.reset()
-        detector.close()
-        executor.shutdown()
     }
+
 
     @SuppressLint("UnsafeOptInUsageError")
     private fun analyze(proxy: ImageProxy) {
         val media = proxy.image
-        if (media == null) {
+        if (media == null || stopped) {
             proxy.close()
             return
         }
         val image = InputImage.fromMediaImage(media, proxy.imageInfo.rotationDegrees)
-        detector.process(image)
-            .addOnSuccessListener(executor) { pose -> handle(pose) }
-            .addOnCompleteListener(executor) { proxy.close() }
+        try {
+            detector.process(image)
+                .addOnSuccessListener(safeExecutor) { pose -> handle(pose) }
+                // Close the frame on whatever thread finishes it, so it is closed even after stop.
+                .addOnCompleteListener { proxy.close() }
+        } catch (e: Exception) {
+            // The detector was closed under us.
+            proxy.close()
+        }
     }
 
     private fun handle(pose: Pose) {
+        if (stopped) return
         val now = SystemClock.elapsedRealtime()
         // The upper body runs on every frame where head and shoulders are visible, so its rhythm
         // and intensity stay continuous when the hips move in and out of frame.

@@ -48,7 +48,7 @@ class MotionService : LifecycleService() {
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
         if (intent?.action == ACTION_STOP) {
-            stopSelf()
+            stopTracking()
             return START_NOT_STICKY
         }
         if (intent?.action == ACTION_CONNECT_HOST) {
@@ -97,7 +97,7 @@ class MotionService : LifecycleService() {
         MotionBus.setRunning(true)
 
         if (Settings.canDrawOverlays(this)) {
-            overlay = OverlayBubble(this).also { bubble ->
+            overlay = OverlayBubble(this, onTap = ::openApp, onDropOnTrash = ::stopTracking).also { bubble ->
                 bubble.show()
                 lifecycleScope.launch {
                     MotionBus.latest.filterNotNull().collect { bubble.update(it.new) }
@@ -118,16 +118,44 @@ class MotionService : LifecycleService() {
     }
 
     override fun onDestroy() {
-        stepSource?.stop()
-        cameraSource?.stop()
-        overlay?.hide()
-        gamepad?.stop()
+        // Each part is torn down on its own, so one failing can't crash the app or leave the
+        // others (camera, sensors, Bluetooth) running.
+        teardown("step sensor") { stepSource?.stop() }
+        teardown("camera") { cameraSource?.stop() }
+        teardown("overlay") { overlay?.hide() }
+        teardown("gamepad") { gamepad?.stop() }
         gamepad = null
         stepSource = null
         cameraSource = null
         overlay = null
         MotionBus.setRunning(false)
         super.onDestroy()
+    }
+
+    private inline fun teardown(part: String, block: () -> Unit) {
+        try {
+            block()
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not stop the $part", e)
+        }
+    }
+
+    /** Stops tracking: removes the notification and ends the service. */
+    private fun stopTracking() {
+        ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_REMOVE)
+        stopSelf()
+    }
+
+    /** Brings Roaming to the front, from a tap on the overlay bubble. */
+    private fun openApp() {
+        val intent = Intent(this, MainActivity::class.java)
+            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP)
+        try {
+            // Allowed from the background because the bubble is a visible overlay window.
+            startActivity(intent)
+        } catch (e: Exception) {
+            Log.e(TAG, "Could not open Roaming", e)
+        }
     }
 
     private fun startInForeground(useSteps: Boolean, useCamera: Boolean, useGamepad: Boolean) {
@@ -152,8 +180,8 @@ class MotionService : LifecycleService() {
             this, 0, Intent(this, MainActivity::class.java),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
-        val stop = PendingIntent.getService(
-            this, 1, Intent(this, MotionService::class.java).setAction(ACTION_STOP),
+        val stop = PendingIntent.getBroadcast(
+            this, 1, Intent(this, StopTrackingReceiver::class.java).setAction(ACTION_STOP),
             PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT,
         )
         val inputs = listOfNotNull(
@@ -163,6 +191,7 @@ class MotionService : LifecycleService() {
         ).joinToString(" + ")
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_stat_roaming)
+            .setColor(ContextCompat.getColor(this, R.color.roaming_green))
             .setContentTitle(getString(R.string.notification_title))
             .setContentText(getString(R.string.notification_text, inputs))
             .setContentIntent(openApp)
@@ -210,7 +239,7 @@ class MotionService : LifecycleService() {
         }
 
         fun stop(context: Context) {
-            context.startService(Intent(context, MotionService::class.java).setAction(ACTION_STOP))
+            context.stopService(Intent(context, MotionService::class.java))
         }
     }
 }
