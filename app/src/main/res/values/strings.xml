@@ -31,9 +31,11 @@
     <string name="safety_close">Close</string>
     <string name="safety_must_accept">Accept the safety disclaimer to start tracking.</string>
     <string name="safety_reminder_interval">Remind me to watch my surroundings</string>
-    <string name="safety_reminder_interval_hint">While tracking, the motion bubble regularly turns into a reminder to look up and check your surroundings.</string>
+    <string name="safety_reminder_interval_hint">While tracking, a reminder to look up and check your surroundings regularly pops up in its own box under the motion bubble.</string>
     <string name="safety_reminder_every">Every %1$d min</string>
-    <string name="safety_reminder_bubble">Watch your surroundings</string>
+    <string name="safety_reminder_box">\u26A0 Watch your surroundings</string>
+    <string name="overlay_bubble_description">Roaming motion bubble. Tap to open Roaming, drag to the bin to stop tracking.</string>
+    <string name="overlay_trash_description">Drop here to stop tracking</string>
 
     <!-- Gamepad mode -->
     <string name="gamepad_short">Gamepad</string>

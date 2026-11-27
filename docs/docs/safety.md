@@ -18,7 +18,7 @@ Roaming turns body movement into game input, which means people move around whil
 
 - **First launch**: Roaming shows the safety warning and disclaimer, and it must be accepted before tracking can start. Choosing **Exit** closes the app. If the disclaimer changes in a later version, it is shown again.
 - **Any time later**: the **Safety and disclaimer** button on the main screen shows the full text again.
-- **Surroundings reminder**: while tracking, the motion bubble turns amber and shows "⚠ Watch your surroundings" for a few seconds, once when tracking starts and then regularly. The interval is set on the main screen (every 2, 5, 10, 15 or 30 minutes, default 5) and can be changed while tracking. Reminders can't be turned off. They are shown on the bubble, so allow "display over other apps" to see them.
+- **Surroundings reminder**: while tracking, a red box with "⚠ Watch your surroundings" appears under the motion bubble for a few seconds, once when tracking starts and then regularly. The interval is set on the main screen (every 2, 5, 10, 15 or 30 minutes, default 5) and can be changed while tracking. Reminders can't be turned off. They are shown with the bubble, so allow "display over other apps" to see them.
 
 ### For game developers
 

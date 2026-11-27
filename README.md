@@ -41,7 +41,7 @@ intensity
 }
 ````
 
-When active, Roaming also shows an overlay on the screen: a small draggable bubble showing the current motion.
+When active, Roaming also shows an overlay on the screen: a small draggable bubble showing the current motion. Tap the bubble to open Roaming, or drag it onto the bin that appears at the bottom of the screen to stop tracking.
 
 ## Event reference
 
@@ -128,7 +128,7 @@ It works with Windows, Linux / SteamOS, Android / Android TV / ChromeOS, browser
 
 **Roaming is provided "as is", without any warranty. You are responsible for all use of the app.** Moving while looking at a screen can lead to falls and collisions, so only use Roaming in a safe environment (a clear, flat area away from traffic, stairs, water, furniture and other people) and keep track of your surroundings at all times.
 
-In the app, the safety warning and disclaimer must be accepted on first launch before tracking can start, and can be read again from **Safety and disclaimer** on the main screen. While tracking, the motion bubble regularly turns into a "Watch your surroundings" reminder (every 5 minutes by default; 2 to 30 minutes can be chosen in the app). See the [safety docs](https://drsounds.github.io/roaming-android-app/safety).
+In the app, the safety warning and disclaimer must be accepted on first launch before tracking can start, and can be read again from **Safety and disclaimer** on the main screen. While tracking, a "Watch your surroundings" reminder regularly pops up in its own box under the motion bubble (every 5 minutes by default; 2 to 30 minutes can be chosen in the app). See the [safety docs](https://drsounds.github.io/roaming-android-app/safety).
 
 # Using the app
 

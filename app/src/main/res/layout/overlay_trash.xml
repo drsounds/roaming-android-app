@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The bin shown at the bottom of the screen while the bubble is dragged. -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/trash"
+    android:layout_width="72dp"
+    android:layout_height="72dp"
+    android:background="@drawable/trash_background"
+    android:contentDescription="@string/overlay_trash_description">
+
+    <ImageView
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:layout_gravity="center"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_trash" />
+</FrameLayout>
